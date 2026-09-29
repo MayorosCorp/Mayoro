@@ -99,10 +99,14 @@
                     <span class="btn disabled" aria-disabled="true">Temporalmente sin stock</span>
                 @elseif (Auth::check() && Auth::user()->rol === 'bodega')
                     <a class="btn" href="{{ route('quotes.create', ['producto' => $prod->id]) }}">Cotizar pedido</a>
+                @elseif (Auth::check())
+                    <span style="font-size:.8rem; color:#6b7280;">Solo bodegas cotizan</span>
                 @else
-                    <a class="btn" href="{{ route('auth.login', ['returnUrl' => route('products.show', $prod->id)]) }}">
+                    {{-- Ficha CI-COD-13: cada tarjeta declara su propio returnUrl --}}
+                    <button class="btn" type="button" data-modal-abrir="authModal"
+                            data-return-url="{{ route('products.show', $prod->id) }}">
                         Ingresar para cotizar
-                    </a>
+                    </button>
                 @endif
 
                 <span style="font-size:.75rem; color:#6b7280;">
@@ -123,4 +127,8 @@
     @if ($products->hasPages())
         <div style="margin-top:2rem;">{{ $products->links() }}</div>
     @endif
+
+    @guest
+        <x-auth-modal />
+    @endguest
 @endsection
