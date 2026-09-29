@@ -132,11 +132,16 @@ class ProductController extends Controller
         ]);
     }
 
-    public function edit(string|int $product): View
+    /**
+     * El formulario de edición también exige propiedad: sin este control un
+     * distribuidor podía abrir el formulario de otro catálogo y solo fallaría
+     * al guardar, con un error en lugar de un 403 claro.
+     */
+    public function edit(Request $request, string|int $product): View
     {
-        $productModel = is_numeric($product) ? Product::with('distribuidor')->findOrFail($product) : $product;
+        $productModel = $this->buscarProductoPropio($request, $product);
 
-        return view('products.edit', ['product' => $productModel]);
+        return view('products.edit', ['product' => $productModel->load('distribuidor')]);
     }
 
     public function update(StoreProductRequest $request, string|int $product): RedirectResponse
