@@ -1,59 +1,156 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mayoro — Plataforma B2B de Cotizaciones
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Mayoro es un sistema web B2B para la gestión integral del ciclo de cotización-compra entre empresas: permite registrar productos, proveedores, generar cotizaciones, convertirlas en pedidos, controlar el inventario y emitir reportes de gestión.
 
-## About Laravel
+## Propósito del sistema
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Catálogo de productos** gestionado por SKU, con precios y proveedor asociado.
+- **Directorio de proveedores** con datos de contacto normativos (RUC, razón social).
+- **Flujo de cotizaciones** desde la solicitud hasta la conversión en pedido.
+- **Pedidos de compra** vinculados a cotizaciones y proveedores con fechas de entrega.
+- **Inventario** con entradas, salidas y ajustes de stock.
+- **Reportes** operativos por tipo (cotizaciones, pedidos, inventario, proveedores) y rango de fechas.
+- **Autenticación** de empresas con acceso restringido (`auth` middleware) al resto del portal.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tecnologías
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Laravel 12** (PHP 8.2+)
+- **SQLite** por defecto (reemplazable vía `.env` por MySQL/PostgreSQL)
+- **Blade** + **Vite** para el frontend
 
-## Learning Laravel
+## Arquitectura de módulos
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+```
+app/Http/Controllers/
+├── AuthController.php        # Login, registro y logout
+├── DashboardController.php   # Panel principal con métricas
+├── ProductController.php     # CRUD de productos
+├── SupplierController.php    # CRUD de proveedores
+├── QuoteController.php       # CRUD de cotizaciones
+├── OrderController.php       # CRUD de pedidos
+├── InventoryController.php   # Movimientos de stock
+└── ReportController.php      # Generación de reportes
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+resources/views/
+├── layouts/app.blade.php     # Layout base compartido
+├── auth/                     # Login y registro
+├── dashboard/                # Panel principal
+├── products/                 # Índice, crear, editar, detalle
+├── suppliers/                # Índice, crear, editar, detalle
+├── quotes/                   # Índice, crear, editar, detalle
+├── orders/                   # Índice, crear, editar, detalle
+├── inventory/                # Índice, crear, editar
+└── reports/                  # Índice y generador
+```
 
-## Laravel Sponsors
+Las rutas viven en `routes/web.php` y separan explícitamente los verbos HTTP: `GET` para vistas y `POST`/`PUT`/`DELETE` para acciones, apuntando cada una a un controlador dedicado (no se usan `Route::match` de verbos combinados).
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Instalación local
 
-### Premium Partners
+Requisitos: PHP >= 8.2, Composer 2 y Node.js (para Vite).
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+# 1. Clonar el repositorio
+git clone <repo-url> mayoro
+cd mayoro
 
-## Contributing
+# 2. Dependencias de PHP y JavaScript
+composer install
+npm install
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 3. Configuración del entorno
+cp .env.example .env
+php artisan key:generate
 
-## Code of Conduct
+# 4. Base de datos (SQLite por defecto)
+touch database/database.sqlite
+php artisan migrate
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# 5. Enlazar el almacenamiento público de archivos
+# Imprescindible: la carga de imagen de producto (HU-02) guarda los archivos
+# en storage/app/public y los expone a través de public/storage. Ese enlace es
+# un archivo del sistema y está en .gitignore, por lo que no viaja en el
+# repositorio. Sin este paso la aplicación funciona, pero toda imagen de
+# producto sale como enlace roto.
+php artisan storage:link
 
-## Security Vulnerabilities
+# 6. Levantar el servidor de desarrollo
+php artisan serve
+# En otra terminal:
+npm run dev
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Abre `http://localhost:8000` en el navegador.
 
-## License
+Cuenta de prueba con datos de ejemplo, creada por el seeder:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+ventas@distribuidora-andina.pe / password   (distribuidor, puede publicar)
+compras@bodegaelcomercio.pe / password     (bodega, solo compra y cotiza)
+```
+
+## Estrategia de ramas: Gitflow
+
+- `main` → producción (estable, solo mediante merges de release).
+- `develop` → integración continua; es la rama de trabajo.
+- `feature/*` → nuevas funcionalidades (se crean desde `develop`).
+- `release/*` → preparación de versiones.
+- `hotfix/*` → correcciones urgentes en producción.
+
+Regla de oro: **nunca** se hace commit directo a `main`; todo llega mediante *pull requests* o merges controlados desde `develop`.
+
+## Convención de commits: Conventional Commits 1.0.0
+
+Formato obligatorio:
+
+```
+<tipo>(<alcance>): <descripción en imperativo y minúsculas>
+```
+
+Ejemplos válidos:
+
+```bash
+feat(quotes): add quote approval workflow
+fix(auth): prevent session fixation on login
+refactor(routes): separate HTTP verbs and map dedicated controllers
+docs(readme): add project setup and commit convention guidelines
+```
+
+### Tipos permitidos
+
+| Tipo            | Uso                                                        |
+|-----------------|------------------------------------------------------------|
+| `feat`          | Nueva funcionalidad                                        |
+| `fix`           | Corrección de errores                                      |
+| `refactor`      | Cambio de código sin alterar comportamiento                |
+| `docs`          | Cambios en documentación                                   |
+| `style`         | Formato, espacios, punto y coma (sin cambios de lógica)    |
+| `test`          | Adición o modificación de pruebas                          |
+| `chore`         | Tareas de mantenimiento, dependencias, config de repo      |
+| `build`         | Cambios en el sistema de build o dependencias externas     |
+| `ci`            | Cambios en CI y pipelines                                  |
+| `perf`          | Mejoras de rendimiento                                     |
+| `revert`        | Reversión de un commit anterior                            |
+
+### Reglas
+
+- La descripción va en **imperativo** y **minúsculas** (p. ej. `add`, no `added/_adds/Added`).
+- Para breaking changes, agregar `!` tras el tipo/alcance: `feat(quotes)!: drop pdf export`.
+- El alcance es opcional pero recomendado (módulo afectado).
+- Un commit debe representar **una única** unidad de cambio lógica.
+
+## Pipeline de calidad
+
+```bash
+./vendor/bin/pint            # Formato de código (PSR-12 / Laravel preset)
+./vendor/bin/pint --test     # Verificar que el formato es correcto
+php artisan route:list       # Listar rutas registradas
+php artisan view:cache       # Compilar todas las vistas Blade
+php artisan test             # Ejecutar la suite de pruebas
+```
+
+## Notas de seguridad
+
+- `.env`, `vendor/`, `node_modules` y otros artefactos locales están excluidos vía `.gitignore`.
+- Todos los módulos de negocio están protegidos por el middleware `auth`.
+- Las contraseñas se procesan mediante el `Hash` manager de Laravel en el flujo de autenticación.
