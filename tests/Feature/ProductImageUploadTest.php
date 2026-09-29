@@ -43,6 +43,7 @@ class ProductImageUploadTest extends TestCase
             'unidades_por_bulto' => 12,
             'precio_bulto' => 120.00,
             'moq_cantidad_minima' => 5,
+            'stock_disponible' => 240,
         ], $extra);
     }
 

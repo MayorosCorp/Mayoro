@@ -280,4 +280,109 @@ class ProductStockStateTest extends TestCase
 
         $this->assertTrue($producto->refresh()->is_active);
     }
+
+    /**
+     * Ficha CI-TEST-15: el stock declarado en el alta es el stock del producto.
+     *
+     * Defecto de origen: `ProductController@store` no guardaba `stock_disponible`,
+     * la columna tiene `default(0)` y el formulario de alta no pedía el dato.
+     * En consecuencia, todo producto publicado por la interfaz nacía agotado y
+     * el catálogo lo mostraba como "Temporalmente sin stock", obligando al
+     * distribuidor a una segunda pasada por la edición para vender algo. La
+     * enumeración de estados de esta misma clase pasaba los ocho casos porque
+     * construía el producto por el modelo, sin atravesar el alta real.
+     */
+    public function test_el_alta_persiste_el_stock_que_ingreso_el_distribuidor(): void
+    {
+        $this->actingAs($this->distribuidor)
+            ->post(route('products.store'), $this->payloadAlta(['stock_disponible' => 120]))
+            ->assertRedirect(route('products.index'))
+            ->assertSessionHasNoErrors();
+
+        $producto = Product::sole();
+
+        $this->assertSame(120, $producto->stock_disponible);
+        $this->assertSame('disponible', $producto->estado_stock);
+        $this->assertFalse($producto->esta_agotado);
+    }
+
+    /**
+     * El dato es obligatorio: sin él no se crea nada. Antes, omitirlo producía
+     * un producto publicado con stock cero, que es un estado legítimo pero que
+     * el distribuidor no había pedido en ningún momento.
+     */
+    public function test_publicar_sin_indicar_el_stock_no_crea_el_producto(): void
+    {
+        $payload = $this->payloadAlta();
+        unset($payload['stock_disponible']);
+
+        $response = $this->actingAs($this->distribuidor)
+            ->post(route('products.store'), $payload);
+
+        $response->assertSessionHasErrors(['stock_disponible']);
+        $this->assertSame(
+            'Debe indicar cuántas unidades tiene disponibles',
+            session('errors')->first('stock_disponible')
+        );
+        $this->assertDatabaseCount('productos_mayoristas', 0);
+    }
+
+    /**
+     * Un stock negativo es un error de captura, no un estado del catálogo.
+     */
+    public function test_rechaza_un_stock_negativo(): void
+    {
+        $this->actingAs($this->distribuidor)
+            ->post(route('products.store'), $this->payloadAlta(['stock_disponible' => -5]))
+            ->assertSessionHasErrors(['stock_disponible']);
+
+        $this->assertDatabaseCount('productos_mayoristas', 0);
+    }
+
+    /**
+     * El cero sigue siendo válido, porque el requisito contempla el producto
+     * agotado. La diferencia es que ahora es una decisión informada: el campo
+     * es obligatorio y su ayuda explica la consecuencia en el catálogo.
+     */
+    public function test_publicar_con_stock_cero_sigue_siendo_valido_y_deliberado(): void
+    {
+        $this->actingAs($this->distribuidor)
+            ->post(route('products.store'), $this->payloadAlta(['stock_disponible' => 0]))
+            ->assertRedirect(route('products.index'))
+            ->assertSessionHasNoErrors();
+
+        $producto = Product::sole();
+
+        $this->assertSame(0, $producto->stock_disponible);
+        $this->assertSame('sin_stock', $producto->estado_stock);
+    }
+
+    /**
+     * El formulario de alta debe ofrecer el campo y advertir de la consecuencia.
+     */
+    public function test_el_formulario_de_alta_pide_el_stock_y_explica_el_cero(): void
+    {
+        $this->actingAs($this->distribuidor)
+            ->get(route('products.create'))
+            ->assertOk()
+            ->assertSee('name="stock_disponible"', escape: false)
+            ->assertSee('Temporalmente sin stock', escape: false);
+    }
+
+    /**
+     * @param  array<string, mixed>  $sobrescribir
+     * @return array<string, mixed>
+     */
+    private function payloadAlta(array $sobrescribir = []): array
+    {
+        return array_merge([
+            'nombre' => 'Aceite Primor 1L x 12',
+            'categoria' => 'Abarrotes',
+            'presentacion' => 'Caja',
+            'unidades_por_bulto' => 12,
+            'precio_bulto' => 120.00,
+            'moq_cantidad_minima' => 5,
+            'stock_disponible' => 240,
+        ], $sobrescribir);
+    }
 }
