@@ -191,11 +191,33 @@ class PublicCatalogTest extends TestCase
     /**
      * HU-03: Un producto inactivo no es accesible ni por su URL directa.
      */
-    public function test_un_producto_pausado_devuelve_404_en_su_url_directa(): void
+    /**
+     * HU-03, escenario "Producto agotado o suspendido (Caso Alternativo)": el
+     * producto pausado se muestra opaco, sin botón de compra y con la leyenda
+     * "Temporalmente sin stock".
+     *
+     * La prueba anterior afirmaba un 404 en la URL directa del producto pausado.
+     * Eso contradecía al propio requisito y al catálogo, que lo mostraba y lo
+     * enlazaba: pulsar la tarjeta llevaba a un enlace muerto y dejaba
+     * inalcanzable el texto que explica al bodeguero la situación.
+     */
+    public function test_un_producto_pausado_sigue_siendo_accesible_en_su_url_directa(): void
     {
         $producto = $this->producto(['is_active' => false]);
 
-        $this->get(route('products.show', $producto->id))->assertNotFound();
+        $this->get(route('products.show', $producto->id))
+            ->assertOk()
+            ->assertSee('Pausado por el distribuidor', escape: false)
+            ->assertSee('Ver catálogo del distribuidor', escape: false);
+    }
+
+    /**
+     * Un identificador que no existe sí debe seguir produciendo 404: la
+     * diferencia entre producto pausado y producto inexistente importa.
+     */
+    public function test_un_identificador_inexistente_sigue_dando_404(): void
+    {
+        $this->get(route('products.show', 999999))->assertNotFound();
     }
 
     /**
