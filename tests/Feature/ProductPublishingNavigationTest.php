@@ -194,6 +194,33 @@ class ProductPublishingNavigationTest extends TestCase
     }
 
     /**
+     * Ocultar el acceso sin explicar la causa deja al usuario buscando un botón
+     * que el sistema nunca le ofreció. El bodeguero debe leer el motivo.
+     */
+    public function test_el_rol_bodega_recibe_explicacion_del_bloqueo_de_publicacion(): void
+    {
+        $this->actingAs($this->bodega)
+            ->get(route('dashboard.index'))
+            ->assertOk()
+            ->assertSee('exclusiva del perfil', escape: false)
+            ->assertSee('Distribuidor Mayorista', escape: false)
+            ->assertSee('Tu rol actual es', escape: false)
+            ->assertSee('bodega', escape: false);
+    }
+
+    /**
+     * El distribuidor no debe recibir el aviso de bloqueo: para él sí existe el
+     * acceso, y el texto lo confundiria.
+     */
+    public function test_el_distribuidor_no_recibe_el_aviso_de_bloqueo(): void
+    {
+        $this->actingAs($this->distribuidor)
+            ->get(route('dashboard.index'))
+            ->assertOk()
+            ->assertDontSee('exclusiva del perfil', escape: false);
+    }
+
+    /**
      * El dashboard no debe mostrar un cero de productos cuando el distribuidor
      * ya publicó: se leería como que la publicación falló.
      */
