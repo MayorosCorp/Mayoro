@@ -117,10 +117,21 @@ class ProductController extends Controller
     /**
      * Detalle público del producto (HU-03). Solo expone productos activos.
      */
+    /**
+     * Detalle público del producto.
+     *
+     * No se filtra por is_active a propósito: HU-03 exige que un producto
+     * pausado siga visible en el catálogo, opaco y con la leyenda "Temporalmente
+     * sin stock". Como la cuadrícula lo enlaza, filtrar aquí devolvía un 404
+     * sobre un enlace que el propio catálogo ofrecía, y dejaba inalcanzable la
+     * rama de la vista que explica la situation al bodeguero.
+     *
+     * Un identificador inexistente sigue produciendo 404 mediante findOrFail.
+     */
     public function show(string|int $product): View
     {
         $productModel = is_numeric($product)
-            ? Product::with('distribuidor')->where('is_active', true)->findOrFail($product)
+            ? Product::with('distribuidor')->findOrFail($product)
             : $product;
 
         $unitario = $productModel->precio_unitario_calculado;
@@ -183,6 +194,34 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')
             ->with('success', 'Producto dado de baja del catálogo.');
+    }
+
+    /**
+     * Reintegra un producto pausado al catálogo.
+     *
+     * La baja es una decisión del distribuidor y debe ser reversible. Se expone
+     * como acción explícita y no como efecto colateral de guardar una edición:
+     * guardar los datos de un producto pausado no debe resucitarlo sin que el
+     * usuario lo haya pedido, porque el catálogo público volvería a ofrecerlo.
+     *
+     * Si el producto sigue sin existencias, reactivarlo lo deja en estado
+     * sin_stock y el catálogo lo mostrará con la leyenda correspondiente, que es
+     * el resultado honesto: el distribuidor también puede ajustar el stock desde
+     * la pantalla de edición antes de republicar.
+     */
+    public function reactivate(Request $request, string|int $product): RedirectResponse
+    {
+        $productModel = $this->buscarProductoPropio($request, $product);
+
+        if ($productModel->is_active) {
+            return redirect()->route('products.show', $productModel->id)
+                ->with('success', 'El producto ya estaba activo en el catálogo.');
+        }
+
+        $productModel->update(['is_active' => true]);
+
+        return redirect()->route('products.show', $productModel->id)
+            ->with('success', 'Producto republicado en el catálogo mayorista.');
     }
 
     /**

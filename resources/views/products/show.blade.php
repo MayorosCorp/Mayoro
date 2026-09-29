@@ -25,7 +25,10 @@
                     </div>
 
                     @if ($product->esta_agotado)
-                        <span class="btn disabled" aria-disabled="true">Temporalmente sin stock</span>
+                        <span style="background:#f9fafb; color:#6b7280; border:1px solid #d1d5db;
+                                     border-radius:999px; padding:.2rem .7rem; font-size:.8rem; font-weight:600;">
+                            {{ $product->etiqueta_estado_stock }}
+                        </span>
                     @else
                         <span style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;
                                      border-radius:999px; padding:.2rem .7rem; font-size:.8rem; font-weight:600;">
@@ -93,11 +96,21 @@
 
     <div class="card" style="margin-top:1rem; text-align:center;">
         @if ($product->esta_agotado)
-            <h2 style="margin-top:0; font-size:1.1rem;">Temporalmente sin stock</h2>
-            <p style="color:#6b7280; margin:0 0 1rem 0;">
-                Este producto fue pausado por el distribuidor o agotó sus existencias.
-                Puedes contactar al distribuidor para conocer la fecha de reposición.
-            </p>
+            <h2 style="margin-top:0; font-size:1.1rem;">{{ $product->etiqueta_estado_stock }}</h2>
+            @if ($product->estado_stock === 'pausado')
+                <p style="color:#6b7280; margin:0 0 1rem 0;">
+                    El distribuidor detuvo la publicación de este producto. Vuelve a contactarlo
+                    para saber si volverá a estarlo.
+                </p>
+            @else
+                <p style="color:#6b7280; margin:0 0 1rem 0;">
+                    Este producto agotó sus existencias por el momento.
+                    Puedes contactar al distribuidor para conocer la fecha de reposición.
+                </p>
+            @endif
+            <a class="btn ghost" href="{{ route('suppliers.show', $product->distribuidor_id) }}">
+                Ver catálogo del distribuidor
+            </a>
         @elseif (Auth::check() && Auth::user()->rol === 'bodega')
             <h2 style="margin-top:0; font-size:1.1rem;">Solicitar cotización</h2>
             <p style="color:#6b7280; margin:0 0 1rem 0;">

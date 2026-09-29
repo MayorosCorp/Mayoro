@@ -96,7 +96,11 @@
                 </span>
 
                 @if ($prod->esta_agotado)
+                    {{-- La leyenda es la exigida por HU-03; el motivo se aclara aparte --}}
                     <span class="btn disabled" aria-disabled="true">Temporalmente sin stock</span>
+                    @if ($prod->estado_stock === 'pausado')
+                        <span style="font-size:.72rem; color:#9ca3af;">Pausado por el distribuidor</span>
+                    @endif
                 @elseif (Auth::check() && Auth::user()->rol === 'bodega')
                     <a class="btn" href="{{ route('quotes.create', ['producto' => $prod->id]) }}">Cotizar pedido</a>
                 @elseif (Auth::check())

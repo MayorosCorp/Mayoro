@@ -66,4 +66,21 @@
             </div>
         </form>
     </div>
+
+    @unless ($product->is_active)
+        <div class="card" style="margin-top:1rem; border-color:#fde68a; background:#fffbeb;">
+            <h2 style="margin-top:0; font-size:1.05rem;">Este producto está fuera del catálogo</h2>
+            <p style="color:#92400e; margin:0 0 1rem 0; font-size:.9rem;">
+                Está pausado, por lo que el catálogo público lo muestra opaco y sin botón de compra.
+                Los cambios que guardes arriba se aplicarán, pero el producto no volverá a ofrecerse
+                hasta que lo republiques.
+            </p>
+
+            <form method="POST" action="{{ route('products.reactivate', $product->id) }}">
+                @csrf
+                @method('PATCH')
+                <button class="btn" type="submit">Republicar en el catálogo</button>
+            </form>
+        </div>
+    @endunless
 @endsection
