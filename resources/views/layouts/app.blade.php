@@ -46,6 +46,10 @@
             <a href="{{ route('orders.index') }}">Pedidos</a>
             <a href="{{ route('inventory.index') }}">Inventario</a>
             <a href="{{ route('reports.index') }}">Reportes</a>
+            @if (auth()->user()->rol === 'distribuidor')
+                <a class="btn" style="background:#f59e0b; color:#3b2500 !important; padding:.3rem .7rem;"
+                   href="{{ route('products.create') }}">+ Publicar Producto</a>
+            @endif
             <span class="grow"></span>
             <span style="font-size:.85rem; opacity:.85;">{{ auth()->user()->razon_social }}</span>
             <form method="POST" action="{{ route('auth.logout') }}">
