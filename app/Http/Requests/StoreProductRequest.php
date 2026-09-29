@@ -30,6 +30,11 @@ class StoreProductRequest extends FormRequest
             'precio_bulto' => ['required', 'numeric', 'gt:0'],
             'moq_cantidad_minima' => ['required', 'integer', 'min:1'],
             'descripcion' => ['nullable', 'string', 'max:1000'],
+            // El alta exige la cifra de forma explicita: el default 0 de la
+            // columna hacia que todo producto naciera "Temporalmente sin
+            // stock" sin que el distribuidor hubiera podido evitarlo. El 0
+            // sigue siendo valido, pero tiene que ser una decision.
+            'stock_disponible' => ['required', 'integer', 'min:0', 'max:1000000'],
             'imagen' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
         ];
     }
@@ -47,6 +52,9 @@ class StoreProductRequest extends FormRequest
             'moq_cantidad_minima.integer' => 'Debe ingresar un valor numérico positivo mayor a cero',
             'unidades_por_bulto.min' => 'Debe ingresar un valor numérico positivo mayor a cero',
             'unidades_por_bulto.integer' => 'Debe ingresar un valor numérico positivo mayor a cero',
+            'stock_disponible.required' => 'Debe indicar cuántas unidades tiene disponibles',
+            'stock_disponible.integer' => 'La cantidad de stock debe ser un número entero',
+            'stock_disponible.min' => 'La cantidad de stock no puede ser negativa',
             'imagen.image' => 'La imagen del producto debe ser un archivo PNG, JPG o WebP',
             'imagen.mimes' => 'La imagen del producto solo admite formato PNG, JPG o WebP',
             'imagen.max' => 'La imagen del producto no debe superar los 2 MB',

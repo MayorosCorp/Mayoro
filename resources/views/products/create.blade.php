@@ -71,6 +71,16 @@
                 </div>
 
                 <div style="margin-top:1rem;">
+                    <label for="stock_disponible">Unidades Disponibles en Stock</label>
+                    <input id="stock_disponible" type="number" min="0" step="1"
+                           name="stock_disponible" value="{{ old('stock_disponible', 0) }}" required>
+                    <small style="display:block; color:#6b7280; font-size:.8rem; margin-top:.3rem;">
+                        Si lo dejas en 0, el producto se publica igualmente pero el catálogo lo
+                        mostrará como <em>"Temporalmente sin stock"</em>, sin botón de compra.
+                    </small>
+                </div>
+
+                <div style="margin-top:1rem;">
                     <label for="descripcion">Descripción del Producto y Condiciones Comerciales (Opcional)</label>
                     <textarea id="descripcion" name="descripcion" rows="3" placeholder="Detalles de conservación, fecha de vencimiento o promociones por volumen...">{{ old('descripcion') }}</textarea>
                 </div>

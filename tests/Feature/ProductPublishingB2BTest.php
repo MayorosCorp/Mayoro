@@ -32,6 +32,7 @@ class ProductPublishingB2BTest extends TestCase
             'unidades_por_bulto' => 12,
             'precio_bulto' => 120.00,
             'moq_cantidad_minima' => 5,
+            'stock_disponible' => 240,
             'descripcion' => 'Caja sellada de 12 botellas de 1L cada una.',
         ];
 
@@ -48,6 +49,7 @@ class ProductPublishingB2BTest extends TestCase
             'unidades_por_bulto' => 12,
             'precio_bulto' => 120.00,
             'moq_cantidad_minima' => 5,
+            'stock_disponible' => 240,
             'precio_unitario_sugerido' => 10.00,
             'is_active' => true,
         ]);
@@ -74,6 +76,7 @@ class ProductPublishingB2BTest extends TestCase
             'unidades_por_bulto' => 1,
             'precio_bulto' => 0.00, // Inválido: <= 0
             'moq_cantidad_minima' => 0, // Inválido: <= 0
+            'stock_disponible' => 100,
         ];
 
         $response = $this->actingAs($distribuidor)->post(route('products.store'), $payload);
@@ -108,6 +111,7 @@ class ProductPublishingB2BTest extends TestCase
             'unidades_por_bulto' => 24,
             'precio_bulto' => 18.50,
             'moq_cantidad_minima' => 3,
+            'stock_disponible' => 48,
         ];
 
         $response = $this->actingAs($bodega)->post(route('products.store'), $payload);
@@ -128,6 +132,7 @@ class ProductPublishingB2BTest extends TestCase
             'unidades_por_bulto' => 24,
             'precio_bulto' => 96.00,
             'moq_cantidad_minima' => 2,
+            'stock_disponible' => 60,
         ];
 
         $response = $this->post(route('products.store'), $payload);
@@ -157,6 +162,7 @@ class ProductPublishingB2BTest extends TestCase
             'unidades_por_bulto' => 1,
             'precio_bulto' => 160.00,
             'moq_cantidad_minima' => 2,
+            'stock_disponible' => 75,
             'descripcion' => "<script>window.location='malicious.com'</script>Saco de azúcar pura.",
         ];
 

@@ -91,6 +91,7 @@ class ProductController extends Controller
             'unidades_por_bulto' => $unidades,
             'precio_bulto' => $precioBulto,
             'moq_cantidad_minima' => (int) $validated['moq_cantidad_minima'],
+            'stock_disponible' => (int) $validated['stock_disponible'],
             'precio_unitario_sugerido' => $precioUnitario,
             'descripcion' => $descripcion,
             'imagen_url' => $imagenUrl,
@@ -180,7 +181,7 @@ class ProductController extends Controller
             'precio_bulto' => $precioBulto,
             'precio_unitario_sugerido' => round($precioBulto / $unidades, 2),
             'moq_cantidad_minima' => (int) $validated['moq_cantidad_minima'],
-            'stock_disponible' => max(0, (int) $request->integer('stock_disponible')),
+            'stock_disponible' => (int) $validated['stock_disponible'],
         ]);
 
         return redirect()->route('products.show', $productModel->id)

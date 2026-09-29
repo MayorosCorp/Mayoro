@@ -93,6 +93,7 @@ class ProductPublishingNavigationTest extends TestCase
             ->assertSee('name="unidades_por_bulto"', escape: false)
             ->assertSee('name="precio_bulto"', escape: false)
             ->assertSee('name="moq_cantidad_minima"', escape: false)
+            ->assertSee('name="stock_disponible"', escape: false)
             ->assertSee('name="descripcion"', escape: false)
             ->assertSee('name="imagen"', escape: false)
             ->assertSee('accept="image/png,image/jpeg,image/webp"', escape: false);
