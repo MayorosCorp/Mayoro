@@ -27,7 +27,7 @@
         @endif
 
         <div class="card">
-            <form method="POST" action="{{ route('products.store') }}">
+            <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data">
                 @csrf
 
                 <div style="display:grid; grid-template-columns: 2fr 1fr; gap:1rem;">
@@ -73,6 +73,16 @@
                 <div style="margin-top:1rem;">
                     <label for="descripcion">Descripción del Producto y Condiciones Comerciales (Opcional)</label>
                     <textarea id="descripcion" name="descripcion" rows="3" placeholder="Detalles de conservación, fecha de vencimiento o promociones por volumen...">{{ old('descripcion') }}</textarea>
+                </div>
+
+                <div style="margin-top:1rem;">
+                    <label for="imagen">Imagen del Producto (Opcional)</label>
+                    <input id="imagen" type="file" name="imagen" accept="image/png,image/jpeg,image/webp"
+                           style="padding:.4rem;">
+                    <small style="display:block; color:#6b7280; font-size:.8rem; margin-top:.3rem;">
+                        Formatos admitidos: PNG, JPG o WebP. Peso máximo 2 MB.
+                        El archivo se almacena con nombre saneado y ruta generada por el servidor.
+                    </small>
                 </div>
 
                 <div style="background:#f0fdf4; border:1px solid #bbf7d0; padding:0.75rem; border-radius:6px; margin-top:1rem; font-size:0.9rem; color:#166534;">

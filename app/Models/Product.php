@@ -22,6 +22,7 @@ class Product extends Model
         'precio_bulto',
         'moq_cantidad_minima',
         'precio_unitario_sugerido',
+        'stock_disponible',
         'imagen_url',
         'is_active',
     ];
@@ -31,6 +32,7 @@ class Product extends Model
         return [
             'precio_bulto' => 'decimal:2',
             'precio_unitario_sugerido' => 'decimal:2',
+            'stock_disponible' => 'integer',
             'unidades_por_bulto' => 'integer',
             'moq_cantidad_minima' => 'integer',
             'is_active' => 'boolean',
@@ -55,5 +57,13 @@ class Product extends Model
         }
 
         return 0.00;
+    }
+
+    /**
+     * Un producto solo es comprable si está activo y además tiene existencias (HU-03).
+     */
+    public function getEstaAgotadoAttribute(): bool
+    {
+        return ! $this->is_active || (int) $this->stock_disponible <= 0;
     }
 }

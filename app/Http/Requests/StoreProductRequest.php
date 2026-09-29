@@ -30,7 +30,7 @@ class StoreProductRequest extends FormRequest
             'precio_bulto' => ['required', 'numeric', 'gt:0'],
             'moq_cantidad_minima' => ['required', 'integer', 'min:1'],
             'descripcion' => ['nullable', 'string', 'max:1000'],
-            'imagen_url' => ['nullable', 'string', 'max:500'],
+            'imagen' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
         ];
     }
 
@@ -47,6 +47,9 @@ class StoreProductRequest extends FormRequest
             'moq_cantidad_minima.integer' => 'Debe ingresar un valor numérico positivo mayor a cero',
             'unidades_por_bulto.min' => 'Debe ingresar un valor numérico positivo mayor a cero',
             'unidades_por_bulto.integer' => 'Debe ingresar un valor numérico positivo mayor a cero',
+            'imagen.image' => 'La imagen del producto debe ser un archivo PNG, JPG o WebP',
+            'imagen.mimes' => 'La imagen del producto solo admite formato PNG, JPG o WebP',
+            'imagen.max' => 'La imagen del producto no debe superar los 2 MB',
         ];
     }
 }
