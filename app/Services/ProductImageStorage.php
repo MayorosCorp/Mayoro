@@ -70,10 +70,26 @@ class ProductImageStorage
 
     /**
      * Elimina la imagen previa del producto, si existía.
+     *
+     * Una ruta con segmentos ".." hace fallar a Flysystem con
+     * `PathTraversalDetected`, que es una excepción no controlada. El valor
+     * proviene de la base y el servicio lo genera siempre en un formato seguro,
+     * así que el riesgo no es que un usuario lo inyecte: es que una fila
+     * corrupta, un valor heredado o una futura edición de datos dejen la ficha
+     * del producto devolviendo un error 500. Se descarta en silencio porque no
+     * existe ningún archivo legítimo que borrar en esa ruta.
      */
     public function eliminar(?string $ruta): void
     {
-        if ($ruta !== null && Storage::disk(self::DISK)->exists($ruta)) {
+        if ($ruta === null || $ruta === '') {
+            return;
+        }
+
+        if (in_array('..', preg_split('#[\\\\/]+#', $ruta) ?: [], true)) {
+            return;
+        }
+
+        if (Storage::disk(self::DISK)->exists($ruta)) {
             Storage::disk(self::DISK)->delete($ruta);
         }
     }
