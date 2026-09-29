@@ -54,6 +54,7 @@ class DatabaseSeeder extends Seeder
                 'unidades_por_bulto' => 12,
                 'precio_bulto' => 78.00,
                 'moq_cantidad_minima' => 20,
+                'stock_disponible' => 320,
             ],
             [
                 'nombre' => 'Gaseosa Cola 1.5 L',
@@ -63,6 +64,7 @@ class DatabaseSeeder extends Seeder
                 'unidades_por_bulto' => 6,
                 'precio_bulto' => 24.50,
                 'moq_cantidad_minima' => 30,
+                'stock_disponible' => 0,
             ],
             [
                 'nombre' => 'Atún en Lata 425 g',
@@ -72,6 +74,7 @@ class DatabaseSeeder extends Seeder
                 'unidades_por_bulto' => 48,
                 'precio_bulto' => 156.00,
                 'moq_cantidad_minima' => 10,
+                'stock_disponible' => 145,
             ],
             [
                 'nombre' => 'Arroz Pilado Superior 5 kg',
@@ -81,6 +84,7 @@ class DatabaseSeeder extends Seeder
                 'unidades_por_bulto' => 4,
                 'precio_bulto' => 92.00,
                 'moq_cantidad_minima' => 15,
+                'stock_disponible' => 210,
             ],
             [
                 'nombre' => 'Azúcar Rubia 1 kg',
@@ -90,6 +94,7 @@ class DatabaseSeeder extends Seeder
                 'unidades_por_bulto' => 20,
                 'precio_bulto' => 68.00,
                 'moq_cantidad_minima' => 12,
+                'stock_disponible' => 88,
             ],
             [
                 'nombre' => 'Leche Evaporada 400 ml',
@@ -99,6 +104,7 @@ class DatabaseSeeder extends Seeder
                 'unidades_por_bulto' => 24,
                 'precio_bulto' => 84.00,
                 'moq_cantidad_minima' => 18,
+                'stock_disponible' => 96,
             ],
             [
                 'nombre' => 'Detergente 3 kg',
@@ -108,6 +114,7 @@ class DatabaseSeeder extends Seeder
                 'unidades_por_bulto' => 4,
                 'precio_bulto' => 56.00,
                 'moq_cantidad_minima' => 25,
+                'stock_disponible' => 60,
             ],
             [
                 'nombre' => 'Papel Higiénico Doble Hoja',
@@ -117,6 +124,7 @@ class DatabaseSeeder extends Seeder
                 'unidades_por_bulto' => 12,
                 'precio_bulto' => 39.90,
                 'moq_cantidad_minima' => 20,
+                'stock_disponible' => 175,
             ],
         ];
 
@@ -136,6 +144,7 @@ class DatabaseSeeder extends Seeder
                     'precio_bulto' => $producto['precio_bulto'],
                     'moq_cantidad_minima' => $producto['moq_cantidad_minima'],
                     'precio_unitario_sugerido' => round($producto['precio_bulto'] / $unidades, 2),
+                    'stock_disponible' => $producto['stock_disponible'],
                     'imagen_url' => null,
                     'is_active' => true,
                 ]
