@@ -33,6 +33,7 @@
                     <th style="padding:0.75rem 1rem;">Precio Unit. Sugerido</th>
                     <th style="padding:0.75rem 1rem;">Pedido Mínimo (MOQ)</th>
                     <th style="padding:0.75rem 1rem;">Distribuidor</th>
+                    <th style="padding:0.75rem 1rem;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -53,10 +54,18 @@
                             </span>
                         </td>
                         <td style="padding:0.75rem 1rem;">{{ $prod->distribuidor->razon_social ?? 'Distribuidor' }}</td>
+                        <td style="padding:0.75rem 1rem; text-align:right;">
+                            @if (Auth::check() && Auth::user()->rol === 'bodega')
+                                <a class="btn" style="padding:.3rem .7rem; font-size:.82rem;"
+                                   href="{{ route('quotes.create', ['producto' => $prod->id]) }}">
+                                    Cotizar
+                                </a>
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" style="text-align:center; padding:2rem; color:#6b7280;">
+                        <td colspan="8" style="text-align:center; padding:2rem; color:#6b7280;">
                             No hay productos registrados en el catálogo mayorista actualmente.
                         </td>
                     </tr>

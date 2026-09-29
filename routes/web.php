@@ -56,9 +56,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', [QuoteController::class, 'create'])->name('create');
         Route::post('/', [QuoteController::class, 'store'])->name('store');
         Route::get('/{quote}', [QuoteController::class, 'show'])->name('show');
-        Route::get('/{quote}/edit', [QuoteController::class, 'edit'])->name('edit');
-        Route::put('/{quote}', [QuoteController::class, 'update'])->name('update');
-        Route::delete('/{quote}', [QuoteController::class, 'destroy'])->name('destroy');
     });
 
     Route::prefix('orders')->name('orders.')->group(function () {
