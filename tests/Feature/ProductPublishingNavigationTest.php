@@ -161,4 +161,89 @@ class ProductPublishingNavigationTest extends TestCase
             ->get(route('products.edit', $productoAjeno->id))
             ->assertForbidden();
     }
+
+    /**
+     * La acción de publicar debe alcanzarse sin pasar por el catálogo, tanto
+     * desde el menú como desde el dashboard. El menú se comprueba sobre una
+     * pantalla que no tiene su propio botón, para no confundir una entrada con
+     * la otra.
+     */
+    public function test_el_distribuidor_alcanza_la_publicacion_desde_el_menu_y_el_dashboard(): void
+    {
+        $this->actingAs($this->distribuidor)
+            ->get(route('dashboard.index'))
+            ->assertOk()
+            ->assertSee('Publicar Nuevo Producto', escape: false);
+
+        $this->actingAs($this->distribuidor)
+            ->get(route('quotes.index'))
+            ->assertOk()
+            ->assertSee(route('products.create'), escape: false);
+    }
+
+    /**
+     * El bodeguero no debe encontrar la acción de publicación en ninguna de las
+     * dos pantallas.
+     */
+    public function test_el_rol_bodega_no_encuentra_la_accion_de_publicar(): void
+    {
+        $this->actingAs($this->bodega)
+            ->get(route('dashboard.index'))
+            ->assertOk()
+            ->assertDontSee('Publicar Nuevo Producto', escape: false);
+    }
+
+    /**
+     * El dashboard no debe mostrar un cero de productos cuando el distribuidor
+     * ya publicó: se leería como que la publicación falló.
+     */
+    public function test_el_dashboard_refleja_el_catalogo_real_del_distribuidor(): void
+    {
+        $this->actingAs($this->distribuidor)->post(route('products.store'), [
+            'nombre' => 'Leche Evaporada 400ml x 24',
+            'categoria' => 'Lácteos',
+            'presentacion' => 'Caja',
+            'unidades_por_bulto' => 24,
+            'precio_bulto' => 78.00,
+            'moq_cantidad_minima' => 3,
+            'stock_disponible' => 30,
+        ]);
+
+        $this->actingAs($this->distribuidor)
+            ->get(route('dashboard.index'))
+            ->assertOk()
+            ->assertSee('Productos publicados', escape: false)
+            ->assertViewHas('metricas.productos', 1);
+
+        $this->assertDatabaseHas('productos_mayoristas', [
+            'nombre' => 'Leche Evaporada 400ml x 24',
+            'distribuidor_id' => $this->distribuidor->id,
+        ]);
+    }
+
+    /**
+     * El bodeguero ve el total del catálogo publicado, no cero: es el número
+     * que le permite saber si la plataforma tiene oferta.
+     */
+    public function test_el_bodeguero_ve_el_total_del_catalogo_en_el_dashboard(): void
+    {
+        Product::create([
+            'distribuidor_id' => $this->distribuidor->id,
+            'nombre' => 'Producto visible para el bodeguero',
+            'categoria' => 'Abarrotes',
+            'presentacion' => 'Caja',
+            'unidades_por_bulto' => 12,
+            'precio_bulto' => 50.00,
+            'precio_unitario_sugerido' => 4.17,
+            'moq_cantidad_minima' => 2,
+            'stock_disponible' => 10,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($this->bodega)
+            ->get(route('dashboard.index'))
+            ->assertOk()
+            ->assertSee('Productos en catálogo', escape: false)
+            ->assertViewHas('metricas.productos', 1);
+    }
 }
