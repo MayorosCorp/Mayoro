@@ -8,8 +8,7 @@ class QuotationService
 {
     public function __construct(
         private WhatsAppLinkGenerator $whatsapp
-    ) {
-    }
+    ) {}
 
     public function canQuote(int $quantity, int $moq): bool
     {
