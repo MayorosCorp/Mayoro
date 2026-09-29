@@ -66,13 +66,28 @@ php artisan key:generate
 touch database/database.sqlite
 php artisan migrate
 
-# 5. Levantar el servidor de desarrollo
+# 5. Enlazar el almacenamiento público de archivos
+# Imprescindible: la carga de imagen de producto (HU-02) guarda los archivos
+# en storage/app/public y los expone a través de public/storage. Ese enlace es
+# un archivo del sistema y está en .gitignore, por lo que no viaja en el
+# repositorio. Sin este paso la aplicación funciona, pero toda imagen de
+# producto sale como enlace roto.
+php artisan storage:link
+
+# 6. Levantar el servidor de desarrollo
 php artisan serve
 # En otra terminal:
 npm run dev
 ```
 
 Abre `http://localhost:8000` en el navegador.
+
+Cuenta de prueba con datos de ejemplo, creada por el seeder:
+
+```
+ventas@distribuidora-andina.pe / password   (distribuidor, puede publicar)
+compras@bodegaelcomercio.pe / password     (bodega, solo compra y cotiza)
+```
 
 ## Estrategia de ramas: Gitflow
 
