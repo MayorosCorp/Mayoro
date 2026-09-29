@@ -112,20 +112,17 @@
             </p>
             <a class="btn ghost" href="{{ route('products.index') }}">Volver al catálogo</a>
         @else
-            {{-- Ficha CI-COD-12: redirección inteligente conservando returnUrl --}}
-            <h2 style="margin-top:0; font-size:1.1rem;">Inicia sesión para cotizar</h2>
+            {{-- Ficha CI-COD-13: el escenario exige modal informativo, no una tarjeta --}}
+            <h2 style="margin-top:0; font-size:1.1rem;">Cotiza este producto en mayorista</h2>
             <p style="color:#6b7280; margin:0 0 1rem 0;">
-                El catálogo es público, pero la cotización requiere una cuenta de comercio
-                registrada con RUC y WhatsApp.
+                El pedido mínimo es de {{ $product->moq_cantidad_minima }} bultos.
+                Inicia sesión o crea tu cuenta de bodega para generar el resumen de WhatsApp.
             </p>
-            <div style="display:flex; gap:.75rem; justify-content:center; flex-wrap:wrap;">
-                <a class="btn" href="{{ route('auth.login', ['returnUrl' => route('products.show', $product->id)]) }}">
-                    Iniciar sesión
-                </a>
-                <a class="btn ghost" href="{{ route('auth.register', ['returnUrl' => route('products.show', $product->id)]) }}">
-                    Crear cuenta de bodega
-                </a>
-            </div>
+            <button class="btn" type="button" data-modal-abrir="authModal">Cotizar pedido</button>
         @endif
     </div>
+
+    @unless (Auth::check())
+        <x-auth-modal :return-url="route('products.show', $product->id)" />
+    @endunless
 @endsection
