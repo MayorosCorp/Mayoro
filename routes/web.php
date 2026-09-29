@@ -27,8 +27,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     Route::prefix('products')->name('products.')->group(function () {
-        Route::get('/', [ProductController::class, 'index'])->name('index');
-
         // RBAC: Solo distribuidores mayoristas pueden crear, almacenar o modificar productos
         Route::middleware('role:distribuidor')->group(function () {
             Route::get('/create', [ProductController::class, 'create'])->name('create');
@@ -37,18 +35,6 @@ Route::middleware('auth')->group(function () {
             Route::put('/{product}', [ProductController::class, 'update'])->name('update');
             Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
         });
-
-        Route::get('/{product}', [ProductController::class, 'show'])->name('show');
-    });
-
-    Route::prefix('suppliers')->name('suppliers.')->group(function () {
-        Route::get('/', [SupplierController::class, 'index'])->name('index');
-        Route::get('/create', [SupplierController::class, 'create'])->name('create');
-        Route::post('/', [SupplierController::class, 'store'])->name('store');
-        Route::get('/{supplier}', [SupplierController::class, 'show'])->name('show');
-        Route::get('/{supplier}/edit', [SupplierController::class, 'edit'])->name('edit');
-        Route::put('/{supplier}', [SupplierController::class, 'update'])->name('update');
-        Route::delete('/{supplier}', [SupplierController::class, 'destroy'])->name('destroy');
     });
 
     Route::prefix('quotes')->name('quotes.')->group(function () {
@@ -80,4 +66,28 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::post('/generate', [ReportController::class, 'generate'])->name('generate');
     });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Catálogo público (HU-03)
+|--------------------------------------------------------------------------
+| La vitrina mayorista es accesible sin credenciales: es el mecanismo de
+| captación de bodegas. La restricción whereNumber evita que el comodín
+| {product} capture rutas literales como /products/create.
+*/
+Route::prefix('products')->name('products.')->group(function () {
+    Route::get('/', [ProductController::class, 'index'])->name('index');
+    Route::get('/{product}', [ProductController::class, 'show'])->name('show')->whereNumber('product');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Directorio de distribuidores (HU-03)
+|--------------------------------------------------------------------------
+| La ficha del distribuidor es parte de la captación pública de bodegas.
+*/
+Route::prefix('proveedores')->name('suppliers.')->group(function () {
+    Route::get('/', [SupplierController::class, 'index'])->name('index');
+    Route::get('/{supplier}', [SupplierController::class, 'show'])->name('show')->whereNumber('supplier');
 });

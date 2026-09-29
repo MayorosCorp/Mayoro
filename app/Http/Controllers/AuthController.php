@@ -11,9 +11,68 @@ use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    public function showLoginForm(): View
+    /**
+     * Ficha CI-COD-12: el catálogo público redirige al login conservando la URL
+     * de origen (returnUrl) para devolver al visitante al producto que miraba.
+     */
+    public function showLoginForm(Request $request): View
     {
-        return view('auth.login');
+        $returnUrl = $this->sanearReturnUrl($request->query('returnUrl'));
+
+        if ($returnUrl !== null) {
+            $request->session()->put('url.intended', $returnUrl);
+        }
+
+        return view('auth.login', ['returnUrl' => $returnUrl]);
+    }
+
+    public function showRegisterForm(Request $request): View
+    {
+        $returnUrl = $this->sanearReturnUrl($request->query('returnUrl'));
+
+        if ($returnUrl !== null) {
+            $request->session()->put('returnUrl', $returnUrl);
+        }
+
+        return view('auth.register', ['returnUrl' => $returnUrl]);
+    }
+
+    /**
+     * Solo se admite un returnUrl interno al dominio de la aplicación: evita
+     * redirigir al usuario fuera del sitio (open redirect). Las URL absolutas
+     * propias del dominio se normalizan a su ruta relativa.
+     */
+    private function sanearReturnUrl(?string $url): ?string
+    {
+        if ($url === null || trim($url) === '') {
+            return null;
+        }
+
+        $url = trim($url);
+
+        if (str_starts_with($url, '//')) {
+            return null;
+        }
+
+        if (str_starts_with($url, '/')) {
+            return $url;
+        }
+
+        $partes = parse_url($url);
+
+        if ($partes === false || ! isset($partes['host'])) {
+            return null;
+        }
+
+        $hostPropio = (string) parse_url((string) config('app.url'), PHP_URL_HOST);
+
+        if (strcasecmp($partes['host'], $hostPropio) !== 0) {
+            return null;
+        }
+
+        $ruta = $partes['path'] ?? '/';
+
+        return isset($partes['query']) ? $ruta.'?'.$partes['query'] : $ruta;
     }
 
     public function login(Request $request): RedirectResponse
@@ -23,28 +82,28 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        // Autenticar por email_contacto o por email
-        $attemptB2B = [
-            'email_contacto' => $credentials['email'],
-            'password' => $credentials['password'],
-        ];
+        /*
+         * El modelo User apunta a usuarios_b2b, cuya columna de contacto es
+         * email_contacto. No existe una columna `email`: consultarla produciría
+         * un error SQL en lugar del mensaje de credenciales inválidas.
+         */
+        $autenticado = Auth::attempt(
+            [
+                'email_contacto' => $credentials['email'],
+                'password' => $credentials['password'],
+            ],
+            $request->boolean('remember')
+        );
 
-        if (! Auth::attempt($attemptB2B, $request->boolean('remember'))) {
-            if (! Auth::attempt($credentials, $request->boolean('remember'))) {
-                return back()->withErrors([
-                    'email' => __('auth.failed'),
-                ])->onlyInput('email');
-            }
+        if (! $autenticado) {
+            return back()->withErrors([
+                'email' => __('auth.failed'),
+            ])->onlyInput('email');
         }
 
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard.index'));
-    }
-
-    public function showRegisterForm(): View
-    {
-        return view('auth.register');
     }
 
     public function register(Request $request): RedirectResponse
@@ -96,6 +155,12 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+
+        $returnUrl = $this->sanearReturnUrl($request->session()->pull('returnUrl'));
+
+        if ($returnUrl !== null) {
+            return redirect($returnUrl)->with('success', 'Registro exitoso en Mayoro B2B.');
+        }
 
         return redirect()->route('dashboard.index')->with('success', 'Registro exitoso en Mayoro B2B.');
     }

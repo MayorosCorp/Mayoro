@@ -1,13 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Catálogo Mayorista de Productos - Mayoro B2B')
+@section('title', 'Catálogo Mayorista')
 
 @section('content')
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
         <div>
-            <h1>Catálogo de Productos Mayoristas</h1>
-            <p style="color:#666; margin:0.25rem 0 0 0; font-size:0.95rem;">
-                Explora las condiciones mayoristas, empaque y pedido mínimo (MOQ) de los distribuidores oficiales.
+            <h1 style="margin-bottom:.25rem;">Catálogo Mayorista</h1>
+            <p style="color:#6b7280; margin:0; font-size:.95rem;">
+                Explora precios por bulto, presentación y pedido mínimo (MOQ) de los distribuidores
+                registrados. Los precios se muestran sin IGV; el impuesto se desglosa en cada producto.
             </p>
         </div>
 
@@ -16,61 +17,110 @@
         @endif
     </div>
 
-    @if (session('success'))
-        <div style="background:#dcfce7; border:1px solid #22c55e; color:#15803d; padding:0.75rem 1rem; border-radius:6px; margin-bottom:1.5rem;">
-            {{ session('success') }}
+    {{-- Ficha CI-COD-10: buscador por texto y filtro por categoría (HU-03) --}}
+    <form method="GET" action="{{ route('products.index') }}" class="card" style="margin-top:1.5rem;">
+        <div style="display:grid; grid-template-columns:2fr 1fr auto; gap:1rem; align-items:end;">
+            <div>
+                <label for="q">Buscar producto</label>
+                <input id="q" type="search" name="q" value="{{ $busqueda }}"
+                   placeholder="Nombre, descripción, presentación o distribuidor...">
+            </div>
+            <div>
+                <label for="categoria">Categoría</label>
+                <select id="categoria" name="categoria">
+                    <option value="">Todas las categorías</option>
+                    @foreach ($categorias as $opcion)
+                        <option value="{{ $opcion }}" @selected($categoria === $opcion)>{{ $opcion }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div style="display:flex; gap:.5rem;">
+                <button class="btn" type="submit">Filtrar</button>
+                @if ($busqueda !== '' || $categoria !== '')
+                    <a class="btn ghost" href="{{ route('products.index') }}">Limpiar</a>
+                @endif
+            </div>
         </div>
-    @endif
+    </form>
 
-    <div class="card" style="padding:0; overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse;">
-            <thead>
-                <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0; text-align:left;">
-                    <th style="padding:0.75rem 1rem;">Producto</th>
-                    <th style="padding:0.75rem 1rem;">Categoría</th>
-                    <th style="padding:0.75rem 1rem;">Presentación</th>
-                    <th style="padding:0.75rem 1rem;">Precio Bulto</th>
-                    <th style="padding:0.75rem 1rem;">Precio Unit. Sugerido</th>
-                    <th style="padding:0.75rem 1rem;">Pedido Mínimo (MOQ)</th>
-                    <th style="padding:0.75rem 1rem;">Distribuidor</th>
-                    <th style="padding:0.75rem 1rem;"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($products as $prod)
-                    <tr style="border-bottom:1px solid #f1f5f9;">
-                        <td style="padding:0.75rem 1rem; font-weight:600;">{{ $prod->nombre }}</td>
-                        <td style="padding:0.75rem 1rem;">
-                            <span style="background:#e0f2fe; color:#0369a1; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.85rem;">
-                                {{ $prod->categoria }}
-                            </span>
-                        </td>
-                        <td style="padding:0.75rem 1rem;">{{ $prod->presentacion }} ({{ $prod->unidades_por_bulto }} unids)</td>
-                        <td style="padding:0.75rem 1rem; font-weight:700; color:#0f766e;">S/ {{ number_format($prod->precio_bulto, 2) }}</td>
-                        <td style="padding:0.75rem 1rem; color:#64748b;">S/ {{ number_format($prod->precio_unitario_sugerido, 2) }}</td>
-                        <td style="padding:0.75rem 1rem;">
-                            <span style="background:#fef3c7; color:#92400e; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.85rem; font-weight:600;">
-                                {{ $prod->moq_cantidad_minima }} bultos
-                            </span>
-                        </td>
-                        <td style="padding:0.75rem 1rem;">{{ $prod->distribuidor->razon_social ?? 'Distribuidor' }}</td>
-                        <td style="padding:0.75rem 1rem; text-align:right;">
-                            @if (Auth::check() && Auth::user()->rol === 'bodega')
-                                <a class="btn" style="padding:.3rem .7rem; font-size:.82rem;"
-                                   href="{{ route('quotes.create', ['producto' => $prod->id]) }}">
-                                    Cotizar
-                                </a>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="8" style="text-align:center; padding:2rem; color:#6b7280;">
-                            No hay productos registrados en el catálogo mayorista actualmente.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+    <p style="color:#6b7280; font-size:.85rem; margin-top:1rem;">
+        {{ $products->total() }} producto(s) encontrado(s)
+        @if ($busqueda !== '') &middot; texto: <strong>{{ $busqueda }}</strong> @endif
+        @if ($categoria !== '') &middot; categoría: <strong>{{ $categoria }}</strong> @endif
+    </p>
+
+    <div class="grid" style="margin-top:1rem;">
+        @forelse ($products as $prod)
+            <article class="card" style="display:flex; flex-direction:column; gap:.5rem; {{ $prod->esta_agotado ? 'opacity:.65;' : '' }}">
+                @if ($prod->imagen_url)
+                    <img src="{{ Storage::disk('public')->url($prod->imagen_url) }}" alt="{{ $prod->nombre }}"
+                         style="width:100%; height:120px; object-fit:cover; border-radius:.375rem; border:1px solid #e5e7eb;">
+                @else
+                    <div style="width:100%; height:120px; border-radius:.375rem; background:#f3f4f6;
+                                display:flex; align-items:center; justify-content:center; color:#9ca3af; font-size:.8rem;">
+                        Sin imagen
+                    </div>
+                @endif
+
+                <span style="font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:#6b7280;">
+                    {{ $prod->categoria }}
+                </span>
+
+                <a href="{{ route('products.show', $prod->id) }}"
+                   style="font-weight:700; font-size:1rem; text-decoration:none; color:#1f2937;">
+                    {{ $prod->nombre }}
+                </a>
+
+                <span style="font-size:.82rem; color:#6b7280;">
+                    {{ $prod->presentacion }} &middot; {{ $prod->unidades_por_bulto }} und. por bulto
+                </span>
+
+                <div>
+                    <span style="font-size:1.25rem; font-weight:700; color:#12305c;">
+                        S/ {{ number_format($prod->precio_unitario_calculado, 2) }}
+                    </span>
+                    <span style="display:block; font-size:.75rem; color:#6b7280;">
+                        por unidad &middot; bulto S/ {{ number_format((float) $prod->precio_bulto, 2) }}
+                    </span>
+                    <span style="display:block; font-size:.75rem; color:#166534;">
+                        IGV 18%: S/ {{ number_format($prod->precio_unitario_calculado * 0.18, 2) }}
+                        &middot; total S/ {{ number_format($prod->precio_unitario_calculado * 1.18, 2) }}
+                    </span>
+                </div>
+
+                <span style="font-size:.75rem;">
+                    <span style="background:#fffbeb; color:#92400e; border:1px solid #fde68a;
+                                 border-radius:999px; padding:.1rem .55rem;">
+                        MOQ: {{ $prod->moq_cantidad_minima }} bultos
+                    </span>
+                </span>
+
+                @if ($prod->esta_agotado)
+                    <span class="btn disabled" aria-disabled="true">Temporalmente sin stock</span>
+                @elseif (Auth::check() && Auth::user()->rol === 'bodega')
+                    <a class="btn" href="{{ route('quotes.create', ['producto' => $prod->id]) }}">Cotizar pedido</a>
+                @else
+                    <a class="btn" href="{{ route('auth.login', ['returnUrl' => route('products.show', $prod->id)]) }}">
+                        Ingresar para cotizar
+                    </a>
+                @endif
+
+                <span style="font-size:.75rem; color:#6b7280;">
+                    {{ $prod->distribuidor->razon_social ?? 'Distribuidor' }}
+                </span>
+            </article>
+        @empty
+            <div class="card">
+                <h3 style="margin-top:0;">No encontramos productos con esos criterios</h3>
+                <p style="color:#6b7280; margin:0;">
+                    Prueba con otro término de búsqueda o
+                    <a href="{{ route('products.index') }}">muestra todo el catálogo</a>.
+                </p>
+            </div>
+        @endforelse
     </div>
+
+    @if ($products->hasPages())
+        <div style="margin-top:2rem;">{{ $products->links() }}</div>
+    @endif
 @endsection
