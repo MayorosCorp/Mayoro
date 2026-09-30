@@ -44,3 +44,5 @@ pipeline {
         }
     }
 }
+
+echo '¡Pipeline ejecutado con éxito vía Webhook automático!'
