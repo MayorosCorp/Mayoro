@@ -178,4 +178,36 @@ class ProductPublishingB2BTest extends TestCase
             'descripcion' => 'Saco de azúcar pura.',
         ]);
     }
+
+    /**
+     * HU-02: Convencion decimal(10,2) - se rechaza un precio con mas de dos
+     * decimales que la columna redondearia en silencio (desfase con el
+     * precio unitario sugerido).
+     */
+    public function test_rechaza_publicacion_con_precio_de_mas_de_dos_decimales(): void
+    {
+        $distribuidor = User::create([
+            'ruc_empresa' => '20601234567',
+            'razon_social' => 'Distribuidora Central S.A.C.',
+            'email_contacto' => 'distribuidor@central.pe',
+            'telefono_whatsapp' => '+51987654321',
+            'rol' => 'distribuidor',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $payload = [
+            'nombre' => 'Detergente Rox 3 kg x 4',
+            'categoria' => 'Limpieza',
+            'presentacion' => 'Fardo',
+            'unidades_por_bulto' => 4,
+            'precio_bulto' => 56.005,
+            'moq_cantidad_minima' => 10,
+            'stock_disponible' => 40,
+        ];
+
+        $response = $this->actingAs($distribuidor)->post(route('products.store'), $payload);
+
+        $response->assertSessionHasErrors('precio_bulto');
+        $this->assertDatabaseCount('productos_mayoristas', 0);
+    }
 }

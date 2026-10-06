@@ -27,7 +27,10 @@ class StoreProductRequest extends FormRequest
             'categoria' => ['required', 'string', 'max:100'],
             'presentacion' => ['required', 'string', 'max:100'],
             'unidades_por_bulto' => ['required', 'integer', 'min:1'],
-            'precio_bulto' => ['required', 'numeric', 'gt:0'],
+            // decimal:0,2 reserva el maximo de dos cifras decimales exigido por
+            // la convencion decimal(10,2); la columna redondearia un tercer
+            // decimal y provocaria un desfase con precio_unitario_sugerido.
+            'precio_bulto' => ['required', 'numeric', 'gt:0', 'decimal:0,2'],
             'moq_cantidad_minima' => ['required', 'integer', 'min:1'],
             'descripcion' => ['nullable', 'string', 'max:1000'],
             // El alta exige la cifra de forma explicita: el default 0 de la
@@ -48,6 +51,7 @@ class StoreProductRequest extends FormRequest
             'precio_bulto.gt' => 'Debe ingresar un valor numérico positivo mayor a cero',
             'precio_bulto.numeric' => 'Debe ingresar un valor numérico positivo mayor a cero',
             'precio_bulto.min' => 'Debe ingresar un valor numérico positivo mayor a cero',
+            'precio_bulto.decimal' => 'El precio no debe superar las dos cifras decimales',
             'moq_cantidad_minima.min' => 'Debe ingresar un valor numérico positivo mayor a cero',
             'moq_cantidad_minima.integer' => 'Debe ingresar un valor numérico positivo mayor a cero',
             'unidades_por_bulto.min' => 'Debe ingresar un valor numérico positivo mayor a cero',
