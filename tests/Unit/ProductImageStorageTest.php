@@ -66,7 +66,7 @@ class ProductImageStorageTest extends TestCase
      */
     #[DataProvider('nombresSanitizados')]
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_sanea_el_nombre_del_cliente
+    // php artisan test --filter=test_sanea_el_nombre_del_cliente
     public function test_sanea_el_nombre_del_cliente(string $entrada, string $esperado): void
     {
         $ruta = $this->almacenar($entrada);
@@ -83,7 +83,7 @@ class ProductImageStorageTest extends TestCase
      * nombre de archivo se sobrescriban entre si.
      */
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_dos_subidas_del_mismo_archivo_no_se_pisan
+    // php artisan test --filter=test_dos_subidas_del_mismo_archivo_no_se_pisan
     public function test_dos_subidas_del_mismo_archivo_no_se_pisan(): void
     {
         $primera = $this->almacenar('Aceite Primor.png');
@@ -94,8 +94,7 @@ class ProductImageStorageTest extends TestCase
         $this->assertTrue(Storage::disk('public')->exists($segunda));
     }
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_el_archivo_almacenado_cae_en_la_carpeta_de_productos
-
+    // php artisan test --filter=test_el_archivo_almacenado_cae_en_la_carpeta_de_productos
     public function test_el_archivo_almacenado_cae_en_la_carpeta_de_productos(): void
     {
         $ruta = $this->almacenar('Leche Evaporada.png');
@@ -109,7 +108,7 @@ class ProductImageStorageTest extends TestCase
      * no exceder el limite de longitud de archivo del sistema operativo.
      */
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_trunca_los_nombres_excesivamente_largos
+    // php artisan test --filter=test_trunca_los_nombres_excesivamente_largos
     public function test_trunca_los_nombres_excesivamente_largos(): void
     {
         $ruta = $this->almacenar(str_repeat('segmento-de-prueba-', 20).'.png');
@@ -126,7 +125,7 @@ class ProductImageStorageTest extends TestCase
      * podria renombrar un archivo arbitrario a .php y servirse como codigo.
      */
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_la_extension_real_manda_sobre_la_declarada
+    // php artisan test --filter=test_la_extension_real_manda_sobre_la_declarada
     public function test_la_extension_real_manda_sobre_la_declarada(): void
     {
         $png = $this->archivoReal('real.png', $this->bytesPng());
@@ -138,8 +137,7 @@ class ProductImageStorageTest extends TestCase
         $this->assertFalse(Storage::disk('public')->exists('productos/documento.pdf'));
     }
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_url_devuelve_null_para_entradas_vacias
-
+    // php artisan test --filter=test_url_devuelve_null_para_entradas_vacias
     public function test_url_devuelve_null_para_entradas_vacias(): void
     {
         $this->assertNull($this->servicio->url(null));
@@ -147,8 +145,7 @@ class ProductImageStorageTest extends TestCase
         $this->assertNull($this->servicio->url('   '));
     }
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_url_construye_la_direccion_publica
-
+    // php artisan test --filter=test_url_construye_la_direccion_publica
     public function test_url_construye_la_direccion_publica(): void
     {
         $ruta = $this->almacenar('Arroz.png');
@@ -156,8 +153,7 @@ class ProductImageStorageTest extends TestCase
         $this->assertSame(Storage::disk('public')->url($ruta), $this->servicio->url($ruta));
     }
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_eliminar_borra_el_archivo_previo
-
+    // php artisan test --filter=test_eliminar_borra_el_archivo_previo
     public function test_eliminar_borra_el_archivo_previo(): void
     {
         $ruta = $this->almacenar('Detergente.png');
@@ -187,7 +183,7 @@ class ProductImageStorageTest extends TestCase
      */
     #[DataProvider('rutasHostiles')]
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_eliminar_ignora_rutas_con_traversal_sin_lanzar_excepcion
+    // php artisan test --filter=test_eliminar_ignora_rutas_con_traversal_sin_lanzar_excepcion
     public function test_eliminar_ignora_rutas_con_traversal_sin_lanzar_excepcion(?string $ruta): void
     {
         $this->servicio->eliminar($ruta);
@@ -195,8 +191,7 @@ class ProductImageStorageTest extends TestCase
         $this->assertTrue(true, 'eliminar() no debe lanzar con rutas hostiles.');
     }
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_eliminar_acepta_null_y_cadena_vacia
-
+    // php artisan test --filter=test_eliminar_acepta_null_y_cadena_vacia
     public function test_eliminar_acepta_null_y_cadena_vacia(): void
     {
         $this->servicio->eliminar(null);
@@ -205,8 +200,7 @@ class ProductImageStorageTest extends TestCase
         $this->assertTrue(true, 'eliminar() es inocuo cuando no hay imagen previa.');
     }
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_eliminar_ignora_un_archivo_inexistente
-
+    // php artisan test --filter=test_eliminar_ignora_un_archivo_inexistente
     public function test_eliminar_ignora_un_archivo_inexistente(): void
     {
         $this->servicio->eliminar('productos/no-existe-este-archivo.png');
@@ -220,7 +214,7 @@ class ProductImageStorageTest extends TestCase
      * BDD seguiria en verde porque valida contra la misma constante.
      */
 
-    // php artisan test tests/Unit/ProductImageStorageTest.php --filter=test_las_constantes_reflejan_el_criterio_de_aceptacion
+    // php artisan test --filter=test_las_constantes_reflejan_el_criterio_de_aceptacion
     public function test_las_constantes_reflejan_el_criterio_de_aceptacion(): void
     {
         $this->assertSame(2048, ProductImageStorage::PESO_MAXIMO_KB);

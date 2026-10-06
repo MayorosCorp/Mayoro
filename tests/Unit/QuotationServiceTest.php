@@ -16,8 +16,7 @@ class QuotationServiceTest extends TestCase
         parent::tearDown();
     }
 
-    // php artisan test tests/Unit/QuotationServiceTest.php --filter=test_no_permite_cotizar_si_la_cantidad_es_menor_al_moq
-
+    // php artisan test --filter=test_no_permite_cotizar_si_la_cantidad_es_menor_al_moq
     public function test_no_permite_cotizar_si_la_cantidad_es_menor_al_moq(): void
     {
         // CA-01 — Given: un producto con MOQ de 10 unidades
@@ -31,8 +30,7 @@ class QuotationServiceTest extends TestCase
         $this->assertFalse($result);
     }
 
-    // php artisan test tests/Unit/QuotationServiceTest.php --filter=test_permite_cotizar_si_la_cantidad_es_igual_al_moq
-
+    // php artisan test --filter=test_permite_cotizar_si_la_cantidad_es_igual_al_moq
     public function test_permite_cotizar_si_la_cantidad_es_igual_al_moq(): void
     {
         // CA-01 — Given: un producto con MOQ de 10 unidades
@@ -46,8 +44,7 @@ class QuotationServiceTest extends TestCase
         $this->assertTrue($result);
     }
 
-    // php artisan test tests/Unit/QuotationServiceTest.php --filter=test_permite_cotizar_si_la_cantidad_es_mayor_al_moq
-
+    // php artisan test --filter=test_permite_cotizar_si_la_cantidad_es_mayor_al_moq
     public function test_permite_cotizar_si_la_cantidad_es_mayor_al_moq(): void
     {
         // CA-01 — Given: un producto con MOQ de 10 unidades

@@ -14,7 +14,7 @@ class ProductPublishingB2BTest extends TestCase
      * HU-02: Camino Feliz - Publicación exitosa por parte de un Distribuidor Mayorista.
      */
 
-    // php artisan test tests/Feature/ProductPublishingB2BTest.php --filter=test_distribuidor_puede_publicar_producto_con_condiciones_mayoristas_camino_feliz
+    // php artisan test --filter=test_distribuidor_puede_publicar_producto_con_condiciones_mayoristas_camino_feliz
     public function test_distribuidor_puede_publicar_producto_con_condiciones_mayoristas_camino_feliz(): void
     {
         $distribuidor = User::create([
@@ -61,7 +61,7 @@ class ProductPublishingB2BTest extends TestCase
      * HU-02: Caso Negativo - Rechazo si el precio o MOQ es menor o igual a cero.
      */
 
-    // php artisan test tests/Feature/ProductPublishingB2BTest.php --filter=test_rechaza_publicacion_con_precio_o_moq_menor_o_igual_a_cero
+    // php artisan test --filter=test_rechaza_publicacion_con_precio_o_moq_menor_o_igual_a_cero
     public function test_rechaza_publicacion_con_precio_o_moq_menor_o_igual_a_cero(): void
     {
         $distribuidor = User::create([
@@ -98,7 +98,7 @@ class ProductPublishingB2BTest extends TestCase
      * HU-02: Seguridad RBAC - Usuario con rol "bodega" no puede publicar productos (HTTP 403 Forbidden).
      */
 
-    // php artisan test tests/Feature/ProductPublishingB2BTest.php --filter=test_bloquea_publicacion_a_usuario_con_rol_bodega_con_http_403_rbac
+    // php artisan test --filter=test_bloquea_publicacion_a_usuario_con_rol_bodega_con_http_403_rbac
     public function test_bloquea_publicacion_a_usuario_con_rol_bodega_con_http_403_rbac(): void
     {
         $bodega = User::create([
@@ -130,7 +130,7 @@ class ProductPublishingB2BTest extends TestCase
      * HU-02: Seguridad Anónima - Usuario no autenticado es redirigido al login.
      */
 
-    // php artisan test tests/Feature/ProductPublishingB2BTest.php --filter=test_bloquea_publicacion_a_visitante_no_autenticado
+    // php artisan test --filter=test_bloquea_publicacion_a_visitante_no_autenticado
     public function test_bloquea_publicacion_a_visitante_no_autenticado(): void
     {
         $payload = [
@@ -153,7 +153,7 @@ class ProductPublishingB2BTest extends TestCase
      * HU-02: Sanitización de campos contra inyección de scripts XSS.
      */
 
-    // php artisan test tests/Feature/ProductPublishingB2BTest.php --filter=test_sanitiza_campos_de_texto_del_producto_contra_xss
+    // php artisan test --filter=test_sanitiza_campos_de_texto_del_producto_contra_xss
     public function test_sanitiza_campos_de_texto_del_producto_contra_xss(): void
     {
         $distribuidor = User::create([
@@ -195,7 +195,7 @@ class ProductPublishingB2BTest extends TestCase
      * precio unitario sugerido).
      */
 
-    // php artisan test tests/Feature/ProductPublishingB2BTest.php --filter=test_rechaza_publicacion_con_precio_de_mas_de_dos_decimales
+    // php artisan test --filter=test_rechaza_publicacion_con_precio_de_mas_de_dos_decimales
     public function test_rechaza_publicacion_con_precio_de_mas_de_dos_decimales(): void
     {
         $distribuidor = User::create([

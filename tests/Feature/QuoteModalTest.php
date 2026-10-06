@@ -50,7 +50,7 @@ class QuoteModalTest extends TestCase
      * El detalle del producto expone el disparador del modal.
      */
 
-    // php artisan test tests/Feature/QuoteModalTest.php --filter=test_el_detalle_ofrece_el_disparador_del_modal_al_visitante
+    // php artisan test --filter=test_el_detalle_ofrece_el_disparador_del_modal_al_visitante
     public function test_el_detalle_ofrece_el_disparador_del_modal_al_visitante(): void
     {
         $this->get(route('products.show', $this->producto->id))
@@ -64,7 +64,7 @@ class QuoteModalTest extends TestCase
      * escenario dice "modal informativo", no "descarte de la página".
      */
 
-    // php artisan test tests/Feature/QuoteModalTest.php --filter=test_el_modal_es_informativo_y_permite_continuar_explorando
+    // php artisan test --filter=test_el_modal_es_informativo_y_permite_continuar_explorando
     public function test_el_modal_es_informativo_y_permite_continuar_explorando(): void
     {
         $this->get(route('products.show', $this->producto->id))
@@ -80,7 +80,7 @@ class QuoteModalTest extends TestCase
      * El modal conduce al login conservando la URL del producto que se miraba.
      */
 
-    // php artisan test tests/Feature/QuoteModalTest.php --filter=test_el_modal_enlaza_al_login_con_el_return_url_del_producto
+    // php artisan test --filter=test_el_modal_enlaza_al_login_con_el_return_url_del_producto
     public function test_el_modal_enlaza_al_login_con_el_return_url_del_producto(): void
     {
         $destino = route('products.show', $this->producto->id);
@@ -96,7 +96,7 @@ class QuoteModalTest extends TestCase
      * modal no devuelve al visitante a un producto distinto del que pulsó.
      */
 
-    // php artisan test tests/Feature/QuoteModalTest.php --filter=test_la_cuadricula_declara_el_return_url_de_cada_tarjeta
+    // php artisan test --filter=test_la_cuadricula_declara_el_return_url_de_cada_tarjeta
     public function test_la_cuadricula_declara_el_return_url_de_cada_tarjeta(): void
     {
         $this->get(route('products.index'))
@@ -110,7 +110,7 @@ class QuoteModalTest extends TestCase
      * acceso directo a cotizar y el distribuidor no debe ser interrumpido.
      */
 
-    // php artisan test tests/Feature/QuoteModalTest.php --filter=test_el_bodeguero_autenticado_no_recibe_el_modal
+    // php artisan test --filter=test_el_bodeguero_autenticado_no_recibe_el_modal
     public function test_el_bodeguero_autenticado_no_recibe_el_modal(): void
     {
         $bodega = User::create([
@@ -133,7 +133,7 @@ class QuoteModalTest extends TestCase
      * El distribuidor autenticado tampoco: para él el catálogo es suyo.
      */
 
-    // php artisan test tests/Feature/QuoteModalTest.php --filter=test_el_distribuidor_autenticado_no_recibe_el_modal
+    // php artisan test --filter=test_el_distribuidor_autenticado_no_recibe_el_modal
     public function test_el_distribuidor_autenticado_no_recibe_el_modal(): void
     {
         $this->actingAs($this->producto->distribuidor)
@@ -146,7 +146,7 @@ class QuoteModalTest extends TestCase
      * El modal no se renderiza en el catálogo para un visitante ya autenticado.
      */
 
-    // php artisan test tests/Feature/QuoteModalTest.php --filter=test_el_catalogo_no_incluye_el_modal_para_usuarios_con_sesion
+    // php artisan test --filter=test_el_catalogo_no_incluye_el_modal_para_usuarios_con_sesion
     public function test_el_catalogo_no_incluye_el_modal_para_usuarios_con_sesion(): void
     {
         $bodega = User::create([
@@ -169,7 +169,7 @@ class QuoteModalTest extends TestCase
      * attacker puede alterar el parámetro a mano aunque el HTML sea correcto.
      */
 
-    // php artisan test tests/Feature/QuoteModalTest.php --filter=test_el_return_url_del_modal_sigue_saneado_en_el_servidor
+    // php artisan test --filter=test_el_return_url_del_modal_sigue_saneado_en_el_servidor
     public function test_el_return_url_del_modal_sigue_saneado_en_el_servidor(): void
     {
         $this->get(route('auth.login', ['returnUrl' => 'https://sitio-malicioso.example/robo']))
@@ -182,7 +182,7 @@ class QuoteModalTest extends TestCase
      * el login y al autenticar vuelve al producto de origen.
      */
 
-    // php artisan test tests/Feature/QuoteModalTest.php --filter=test_recorrido_completo_del_visitante_anonico_hasta_la_cotizacion
+    // php artisan test --filter=test_recorrido_completo_del_visitante_anonico_hasta_la_cotizacion
     public function test_recorrido_completo_del_visitante_anonico_hasta_la_cotizacion(): void
     {
         $destino = route('products.show', $this->producto->id);

@@ -52,7 +52,7 @@ class ProductImageUploadTest extends TestCase
      * ruta en la base de datos.
      */
 
-    // php artisan test tests/Feature/ProductImageUploadTest.php --filter=test_almacena_la_imagen_en_el_disco_publico_y_registra_la_ruta
+    // php artisan test --filter=test_almacena_la_imagen_en_el_disco_publico_y_registra_la_ruta
     public function test_almacena_la_imagen_en_el_disco_publico_y_registra_la_ruta(): void
     {
         $response = $this->actingAs($this->distribuidor)->post(
@@ -76,7 +76,7 @@ class ProductImageUploadTest extends TestCase
      * servidor y no conserva el nombre original del cliente.
      */
 
-    // php artisan test tests/Feature/ProductImageUploadTest.php --filter=test_sanitiza_el_nombre_del_archivo_almacenado
+    // php artisan test --filter=test_sanitiza_el_nombre_del_archivo_almacenado
     public function test_sanitiza_el_nombre_del_archivo_almacenado(): void
     {
         $this->actingAs($this->distribuidor)->post(
@@ -98,7 +98,7 @@ class ProductImageUploadTest extends TestCase
      * Criterio de aceptación: se admiten PNG, JPG y WebP.
      */
 
-    // php artisan test tests/Feature/ProductImageUploadTest.php --filter=test_acepta_los_formatos_png_jpg_y_webp
+    // php artisan test --filter=test_acepta_los_formatos_png_jpg_y_webp
     public function test_acepta_los_formatos_png_jpg_y_webp(): void
     {
         foreach (['png', 'jpg', 'webp'] as $formato) {
@@ -121,7 +121,7 @@ class ProductImageUploadTest extends TestCase
      * Criterio de aceptación: se rechaza un formato no admitido.
      */
 
-    // php artisan test tests/Feature/ProductImageUploadTest.php --filter=test_rechaza_formatos_no_admitidos
+    // php artisan test --filter=test_rechaza_formatos_no_admitidos
     public function test_rechaza_formatos_no_admitidos(): void
     {
         $response = $this->actingAs($this->distribuidor)->post(
@@ -137,7 +137,7 @@ class ProductImageUploadTest extends TestCase
      * Criterio de aceptación: se rechaza un archivo que excede los 2 MB.
      */
 
-    // php artisan test tests/Feature/ProductImageUploadTest.php --filter=test_rechaza_imagenes_que_superan_los_2_mb
+    // php artisan test --filter=test_rechaza_imagenes_que_superan_los_2_mb
     public function test_rechaza_imagenes_que_superan_los_2_mb(): void
     {
         $response = $this->actingAs($this->distribuidor)->post(
@@ -156,7 +156,7 @@ class ProductImageUploadTest extends TestCase
      * La imagen es opcional: el producto se publica sin ella.
      */
 
-    // php artisan test tests/Feature/ProductImageUploadTest.php --filter=test_la_imagen_es_opcional
+    // php artisan test --filter=test_la_imagen_es_opcional
     public function test_la_imagen_es_opcional(): void
     {
         $this->actingAs($this->distribuidor)->post(route('products.store'), $this->payload());
@@ -169,7 +169,7 @@ class ProductImageUploadTest extends TestCase
      * Al editar con una imagen nueva, la anterior se elimina del disco.
      */
 
-    // php artisan test tests/Feature/ProductImageUploadTest.php --filter=test_la_edicion_reemplaza_la_imagen_y_elimina_la_anterior
+    // php artisan test --filter=test_la_edicion_reemplaza_la_imagen_y_elimina_la_anterior
     public function test_la_edicion_reemplaza_la_imagen_y_elimina_la_anterior(): void
     {
         $this->actingAs($this->distribuidor)->post(
@@ -200,7 +200,7 @@ class ProductImageUploadTest extends TestCase
      * El catálogo público muestra la URL pública de la imagen almacenada.
      */
 
-    // php artisan test tests/Feature/ProductImageUploadTest.php --filter=test_el_catalogo_publico_expone_la_url_de_la_imagen
+    // php artisan test --filter=test_el_catalogo_publico_expone_la_url_de_la_imagen
     public function test_el_catalogo_publico_expone_la_url_de_la_imagen(): void
     {
         $this->actingAs($this->distribuidor)->post(

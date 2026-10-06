@@ -10,8 +10,7 @@ class UserRegistrationB2BTest extends TestCase
 {
     use RefreshDatabase;
 
-    // php artisan test tests/Feature/UserRegistrationB2BTest.php --filter=test_registro_exitoso_de_nuevo_comercio_b2b_camino_feliz
-
+    // php artisan test --filter=test_registro_exitoso_de_nuevo_comercio_b2b_camino_feliz
     public function test_registro_exitoso_de_nuevo_comercio_b2b_camino_feliz(): void
     {
         // HU-01 — Given: un comerciante nuevo con datos válidos
@@ -42,8 +41,7 @@ class UserRegistrationB2BTest extends TestCase
         ]);
     }
 
-    // php artisan test tests/Feature/UserRegistrationB2BTest.php --filter=test_rechaza_registro_si_ruc_no_tiene_11_digitos_caso_de_borde
-
+    // php artisan test --filter=test_rechaza_registro_si_ruc_no_tiene_11_digitos_caso_de_borde
     public function test_rechaza_registro_si_ruc_no_tiene_11_digitos_caso_de_borde(): void
     {
         // HU-01 — Given: intento de registro con RUC de 10 dígitos
@@ -69,8 +67,7 @@ class UserRegistrationB2BTest extends TestCase
         ]);
     }
 
-    // php artisan test tests/Feature/UserRegistrationB2BTest.php --filter=test_rechaza_registro_por_ruc_o_correo_duplicado
-
+    // php artisan test --filter=test_rechaza_registro_por_ruc_o_correo_duplicado
     public function test_rechaza_registro_por_ruc_o_correo_duplicado(): void
     {
         // HU-01 — Given: ya existe un usuario registrado en la base de datos
@@ -102,8 +99,7 @@ class UserRegistrationB2BTest extends TestCase
         ]);
     }
 
-    // php artisan test tests/Feature/UserRegistrationB2BTest.php --filter=test_sanitiza_campos_de_texto_contra_xss
-
+    // php artisan test --filter=test_sanitiza_campos_de_texto_contra_xss
     public function test_sanitiza_campos_de_texto_contra_xss(): void
     {
         // HU-01 — Given: comerciante ingresa etiquetas HTML maliciosas en razón social
