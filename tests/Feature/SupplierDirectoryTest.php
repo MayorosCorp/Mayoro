@@ -27,6 +27,8 @@ class SupplierDirectoryTest extends TestCase
      * HU-03: El directorio lista los comercios distribuidores reales, que antes
      * era un módulo placeholder sin datos.
      */
+
+    // php artisan test tests/Feature/SupplierDirectoryTest.php --filter=test_el_directorio_muestra_los_distribuidores_registrados
     public function test_el_directorio_muestra_los_distribuidores_registrados(): void
     {
         $response = $this->get(route('suppliers.index'));
@@ -39,6 +41,8 @@ class SupplierDirectoryTest extends TestCase
     /**
      * El directorio no debe exponer los comercios con rol bodega.
      */
+
+    // php artisan test tests/Feature/SupplierDirectoryTest.php --filter=test_el_directorio_excluye_los_comercios_con_rol_bodega
     public function test_el_directorio_excluye_los_comercios_con_rol_bodega(): void
     {
         User::factory()->bodega()->create(['razon_social' => 'Bodega No Listada E.I.R.L.']);
@@ -52,6 +56,8 @@ class SupplierDirectoryTest extends TestCase
     /**
      * El buscador filtra por razón social o RUC del distribuidor.
      */
+
+    // php artisan test tests/Feature/SupplierDirectoryTest.php --filter=test_el_buscador_filtra_por_razon_social_y_ruc
     public function test_el_buscador_filtra_por_razon_social_y_ruc(): void
     {
         User::factory()->distribuidor()->create([
@@ -72,6 +78,8 @@ class SupplierDirectoryTest extends TestCase
     /**
      * La ficha del distribuidor muestra su catálogo mayorista vigente.
      */
+
+    // php artisan test tests/Feature/SupplierDirectoryTest.php --filter=test_la_ficha_del_distribuidor_lista_su_catalogo_activo
     public function test_la_ficha_del_distribuidor_lista_su_catalogo_activo(): void
     {
         Product::factory()->create([
@@ -94,6 +102,8 @@ class SupplierDirectoryTest extends TestCase
     /**
      * Un id de bodega no puede invocarse como ficha de distribuidor.
      */
+
+    // php artisan test tests/Feature/SupplierDirectoryTest.php --filter=test_un_id_de_bodega_no_resuelve_como_ficha_de_distribuidor
     public function test_un_id_de_bodega_no_resuelve_como_ficha_de_distribuidor(): void
     {
         $bodega = User::factory()->bodega()->create();
@@ -104,6 +114,8 @@ class SupplierDirectoryTest extends TestCase
     /**
      * La ficha es accesible sin autenticación, es parte de la captación pública.
      */
+
+    // php artisan test tests/Feature/SupplierDirectoryTest.php --filter=test_la_ficha_del_distribuidor_es_publica
     public function test_la_ficha_del_distribuidor_es_publica(): void
     {
         Product::factory()->create([

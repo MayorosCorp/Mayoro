@@ -57,6 +57,8 @@ class QuoteWhatsAppFlowTest extends TestCase
      * HU-04: Camino Feliz - Registro de la cotización y generación del enlace
      * oficial de WhatsApp con el detalle del pedido.
      */
+
+    // php artisan test tests/Feature/QuoteWhatsAppFlowTest.php --filter=test_bodeguero_registra_cotizacion_y_genera_enlace_de_whatsapp_codificado
     public function test_bodeguero_registra_cotizacion_y_genera_enlace_de_whatsapp_codificado(): void
     {
         $response = $this->actingAs($this->bodega)->post(route('quotes.store'), [
@@ -92,6 +94,8 @@ class QuoteWhatsAppFlowTest extends TestCase
      * HU-04: Regla de Negocio - Se bloquea la cotización cuando la cantidad
      * es inferior al MOQ fijado por el distribuidor.
      */
+
+    // php artisan test tests/Feature/QuoteWhatsAppFlowTest.php --filter=test_bloquea_cotizacion_con_cantidad_inferior_al_moq
     public function test_bloquea_cotizacion_con_cantidad_inferior_al_moq(): void
     {
         $response = $this->actingAs($this->bodega)->post(route('quotes.store'), [
@@ -109,6 +113,8 @@ class QuoteWhatsAppFlowTest extends TestCase
     /**
      * HU-04: Regla de Negocio - La cantidad igual al MOQ sí se acepta.
      */
+
+    // php artisan test tests/Feature/QuoteWhatsAppFlowTest.php --filter=test_acepta_cotizacion_con_cantidad_igual_al_moq
     public function test_acepta_cotizacion_con_cantidad_igual_al_moq(): void
     {
         $this->actingAs($this->bodega)->post(route('quotes.store'), [
@@ -129,6 +135,8 @@ class QuoteWhatsAppFlowTest extends TestCase
      * HU-04: Excepción de Contingencia - Si el distribuidor no tiene un
      * teléfono utilizable, la cotización se registra igual y se ofrece el correo.
      */
+
+    // php artisan test tests/Feature/QuoteWhatsAppFlowTest.php --filter=test_degrada_a_correo_cuando_el_distribuidor_no_tiene_telefono_valido
     public function test_degrada_a_correo_cuando_el_distribuidor_no_tiene_telefono_valido(): void
     {
         $this->distribuidor->update(['telefono_whatsapp' => 'no-es-un-telefono']);
@@ -158,6 +166,8 @@ class QuoteWhatsAppFlowTest extends TestCase
      * HU-04: Seguridad RBAC - Un distribuidor no puede generar cotizaciones
      * porque el flujo de compra es exclusivo del rol bodega (HTTP 403).
      */
+
+    // php artisan test tests/Feature/QuoteWhatsAppFlowTest.php --filter=test_bloquea_cotizacion_a_usuario_con_rol_distribuidor_con_http_403_rbac
     public function test_bloquea_cotizacion_a_usuario_con_rol_distribuidor_con_http_403_rbac(): void
     {
         $response = $this->actingAs($this->distribuidor)->post(route('quotes.store'), [
@@ -172,6 +182,8 @@ class QuoteWhatsAppFlowTest extends TestCase
     /**
      * HU-04: Seguridad Anónima - El visitante no autenticado es redirigido al login.
      */
+
+    // php artisan test tests/Feature/QuoteWhatsAppFlowTest.php --filter=test_bloquea_cotizacion_a_visitante_no_autenticado
     public function test_bloquea_cotizacion_a_visitante_no_autenticado(): void
     {
         $response = $this->post(route('quotes.store'), [
@@ -186,6 +198,8 @@ class QuoteWhatsAppFlowTest extends TestCase
     /**
      * HU-04: Confidencialidad - Un comercio ajeno a la cotización no puede verla.
      */
+
+    // php artisan test tests/Feature/QuoteWhatsAppFlowTest.php --filter=test_bloquea_la_visualizacion_de_una_cotizacion_ajena_con_http_403
     public function test_bloquea_la_visualizacion_de_una_cotizacion_ajena_con_http_403(): void
     {
         $this->actingAs($this->bodega)->post(route('quotes.store'), [
@@ -215,6 +229,8 @@ class QuoteWhatsAppFlowTest extends TestCase
     /**
      * HU-04: La vista de detalle expone el enlace codificado y el desglose de IGV.
      */
+
+    // php artisan test tests/Feature/QuoteWhatsAppFlowTest.php --filter=test_la_vista_de_detalle_muestra_el_desglose_y_el_enlace_de_whatsapp
     public function test_la_vista_de_detalle_muestra_el_desglose_y_el_enlace_de_whatsapp(): void
     {
         $this->actingAs($this->bodega)->post(route('quotes.store'), [

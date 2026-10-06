@@ -77,6 +77,8 @@ class ProductStockStateTest extends TestCase
      * @param  array<string, mixed>  $atributos
      */
     #[DataProvider('estados')]
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_la_enumeracion_estado_stock_clasifica_el_producto
     public function test_la_enumeracion_estado_stock_clasifica_el_producto(
         array $atributos,
         string $estadoEsperado,
@@ -96,6 +98,8 @@ class ProductStockStateTest extends TestCase
      * @param  array<string, mixed>  $atributos
      */
     #[DataProvider('estados')]
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_el_catalogo_expone_la_leyenda_que_corresponde
     public function test_el_catalogo_expone_la_leyenda_que_corresponde(
         array $atributos,
         string $estadoEsperado,
@@ -125,6 +129,8 @@ class ProductStockStateTest extends TestCase
      * @param  array<string, mixed>  $atributos
      */
     #[DataProvider('estados')]
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_el_bodeguero_solo_puede_cotizar_productos_adquiribles
     public function test_el_bodeguero_solo_puede_cotizar_productos_adquiribles(
         array $atributos,
         string $estadoEsperado
@@ -155,6 +161,8 @@ class ProductStockStateTest extends TestCase
      * El motivo se distingue en la ficha: un producto pausado no promises fecha
      * de reposición, porque el distribuidor no la respondió.
      */
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_la_ficha_distingue_pausado_de_agotado
     public function test_la_ficha_distingue_pausado_de_agotado(): void
     {
         $pausado = $this->producto(['nombre' => 'Producto pausado', 'is_active' => false, 'stock_disponible' => 40]);
@@ -175,6 +183,8 @@ class ProductStockStateTest extends TestCase
      * Al dar de baja un producto, el enlace del catálogo sigue siendo válido:
      * es la regresión que motivó este trabajo.
      */
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_el_enlace_del_catalogo_no_parte_al_dar_de_baja
     public function test_el_enlace_del_catalogo_no_parte_al_dar_de_baja(): void
     {
         $producto = $this->producto();
@@ -196,6 +206,8 @@ class ProductStockStateTest extends TestCase
      * El distribuidor conserva el control sobre su producto pausado: puede
      * editarlo y republicarlo, porque la baja es una decisión suya.
      */
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_el_distribuidor_puede_republicar_su_producto_pausado
     public function test_el_distribuidor_puede_republicar_su_producto_pausado(): void
     {
         $producto = $this->producto(['is_active' => false, 'stock_disponible' => 12]);
@@ -220,6 +232,8 @@ class ProductStockStateTest extends TestCase
      * Guardar la edición de un producto pausado no debe republicarlo: el
      * catálogo público volvería a ofrecerlo sin que nadie lo pidiera.
      */
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_editar_un_producto_pausado_no_lo_republica
     public function test_editar_un_producto_pausado_no_lo_republica(): void
     {
         $producto = $this->producto(['is_active' => false, 'stock_disponible' => 12]);
@@ -246,6 +260,8 @@ class ProductStockStateTest extends TestCase
     /**
      * Republicar no puede convertirse en una vía para tomar el catálogo ajeno.
      */
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_nadie_puede_republicar_el_producto_de_otro_distribuidor
     public function test_nadie_puede_republicar_el_producto_de_otro_distribuidor(): void
     {
         $producto = $this->producto(['is_active' => false]);
@@ -269,6 +285,8 @@ class ProductStockStateTest extends TestCase
     /**
      * Republicar un producto ya activo es idempotente y no rompe nada.
      */
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_republicar_un_producto_ya_activo_es_idempotente
     public function test_republicar_un_producto_ya_activo_es_idempotente(): void
     {
         $producto = $this->producto();
@@ -292,6 +310,8 @@ class ProductStockStateTest extends TestCase
      * enumeración de estados de esta misma clase pasaba los ocho casos porque
      * construía el producto por el modelo, sin atravesar el alta real.
      */
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_el_alta_persiste_el_stock_que_ingreso_el_distribuidor
     public function test_el_alta_persiste_el_stock_que_ingreso_el_distribuidor(): void
     {
         $this->actingAs($this->distribuidor)
@@ -311,6 +331,8 @@ class ProductStockStateTest extends TestCase
      * un producto publicado con stock cero, que es un estado legítimo pero que
      * el distribuidor no había pedido en ningún momento.
      */
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_publicar_sin_indicar_el_stock_no_crea_el_producto
     public function test_publicar_sin_indicar_el_stock_no_crea_el_producto(): void
     {
         $payload = $this->payloadAlta();
@@ -330,6 +352,8 @@ class ProductStockStateTest extends TestCase
     /**
      * Un stock negativo es un error de captura, no un estado del catálogo.
      */
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_rechaza_un_stock_negativo
     public function test_rechaza_un_stock_negativo(): void
     {
         $this->actingAs($this->distribuidor)
@@ -344,6 +368,8 @@ class ProductStockStateTest extends TestCase
      * agotado. La diferencia es que ahora es una decisión informada: el campo
      * es obligatorio y su ayuda explica la consecuencia en el catálogo.
      */
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_publicar_con_stock_cero_sigue_siendo_valido_y_deliberado
     public function test_publicar_con_stock_cero_sigue_siendo_valido_y_deliberado(): void
     {
         $this->actingAs($this->distribuidor)
@@ -360,6 +386,8 @@ class ProductStockStateTest extends TestCase
     /**
      * El formulario de alta debe ofrecer el campo y advertir de la consecuencia.
      */
+
+    // php artisan test tests/Feature/ProductStockStateTest.php --filter=test_el_formulario_de_alta_pide_el_stock_y_explica_el_cero
     public function test_el_formulario_de_alta_pide_el_stock_y_explica_el_cero(): void
     {
         $this->actingAs($this->distribuidor)

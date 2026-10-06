@@ -47,6 +47,8 @@ class ProductPublishingNavigationTest extends TestCase
     /**
      * El catálogo público muestra el acceso de publicación al distribuidor.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_catalogo_muestra_el_boton_de_publicar_al_distribuidor
     public function test_el_catalogo_muestra_el_boton_de_publicar_al_distribuidor(): void
     {
         $this->actingAs($this->distribuidor)
@@ -59,6 +61,8 @@ class ProductPublishingNavigationTest extends TestCase
     /**
      * El botón no puede ser el punto de entrada de un usuario anónimo.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_visitante_anonimo_no_ve_el_boton_de_publicar
     public function test_el_visitante_anonimo_no_ve_el_boton_de_publicar(): void
     {
         $this->get(route('products.index'))
@@ -69,6 +73,8 @@ class ProductPublishingNavigationTest extends TestCase
     /**
      * El bodeguero tampoco, aunque tenga sesión iniciada.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_rol_bodega_no_ve_el_boton_de_publicar
     public function test_el_rol_bodega_no_ve_el_boton_de_publicar(): void
     {
         $this->actingAs($this->bodega)
@@ -81,6 +87,8 @@ class ProductPublishingNavigationTest extends TestCase
      * El formulario es alcanzable y trae todos los campos de la tabla de
      * mapeo de HU-02, incluida la imagen.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_distribuidor_acllega_al_formulario_de_publicacion
     public function test_el_distribuidor_acllega_al_formulario_de_publicacion(): void
     {
         $this->actingAs($this->distribuidor)
@@ -102,6 +110,8 @@ class ProductPublishingNavigationTest extends TestCase
     /**
      * El bodeguero que fuerza la URL recibe 403, no un formulario inútil.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_rol_bodega_recibe_403_al_forzar_la_url_de_publicacion
     public function test_el_rol_bodega_recibe_403_al_forzar_la_url_de_publicacion(): void
     {
         $this->actingAs($this->bodega)
@@ -112,6 +122,8 @@ class ProductPublishingNavigationTest extends TestCase
     /**
      * El distribuidor ve el producto que acaba de crear y puede editarlo.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_distribuidor_encuentra_y_edita_su_producto_publicado
     public function test_el_distribuidor_encuentra_y_edita_su_producto_publicado(): void
     {
         $this->actingAs($this->distribuidor)->post(route('products.store'), [
@@ -143,6 +155,8 @@ class ProductPublishingNavigationTest extends TestCase
      * Un distribuidor no puede editar el producto de otro: el enlace de
      * edición no debe convertirse en una vía de escalada horizontal.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_un_distribuidor_no_puede_editar_el_producto_de_otro
     public function test_un_distribuidor_no_puede_editar_el_producto_de_otro(): void
     {
         $productoAjeno = Product::create([
@@ -169,6 +183,8 @@ class ProductPublishingNavigationTest extends TestCase
      * pantalla que no tiene su propio botón, para no confundir una entrada con
      * la otra.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_distribuidor_alcanza_la_publicacion_desde_el_menu_y_el_dashboard
     public function test_el_distribuidor_alcanza_la_publicacion_desde_el_menu_y_el_dashboard(): void
     {
         $this->actingAs($this->distribuidor)
@@ -186,6 +202,8 @@ class ProductPublishingNavigationTest extends TestCase
      * El bodeguero no debe encontrar la acción de publicación en ninguna de las
      * dos pantallas.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_rol_bodega_no_encuentra_la_accion_de_publicar
     public function test_el_rol_bodega_no_encuentra_la_accion_de_publicar(): void
     {
         $this->actingAs($this->bodega)
@@ -198,6 +216,8 @@ class ProductPublishingNavigationTest extends TestCase
      * Ocultar el acceso sin explicar la causa deja al usuario buscando un botón
      * que el sistema nunca le ofreció. El bodeguero debe leer el motivo.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_rol_bodega_recibe_explicacion_del_bloqueo_de_publicacion
     public function test_el_rol_bodega_recibe_explicacion_del_bloqueo_de_publicacion(): void
     {
         $this->actingAs($this->bodega)
@@ -213,6 +233,8 @@ class ProductPublishingNavigationTest extends TestCase
      * El distribuidor no debe recibir el aviso de bloqueo: para él sí existe el
      * acceso, y el texto lo confundiria.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_distribuidor_no_recibe_el_aviso_de_bloqueo
     public function test_el_distribuidor_no_recibe_el_aviso_de_bloqueo(): void
     {
         $this->actingAs($this->distribuidor)
@@ -225,6 +247,8 @@ class ProductPublishingNavigationTest extends TestCase
      * El dashboard no debe mostrar un cero de productos cuando el distribuidor
      * ya publicó: se leería como que la publicación falló.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_dashboard_refleja_el_catalogo_real_del_distribuidor
     public function test_el_dashboard_refleja_el_catalogo_real_del_distribuidor(): void
     {
         $this->actingAs($this->distribuidor)->post(route('products.store'), [
@@ -253,6 +277,8 @@ class ProductPublishingNavigationTest extends TestCase
      * El bodeguero ve el total del catálogo publicado, no cero: es el número
      * que le permite saber si la plataforma tiene oferta.
      */
+
+    // php artisan test tests/Feature/ProductPublishingNavigationTest.php --filter=test_el_bodeguero_ve_el_total_del_catalogo_en_el_dashboard
     public function test_el_bodeguero_ve_el_total_del_catalogo_en_el_dashboard(): void
     {
         Product::create([

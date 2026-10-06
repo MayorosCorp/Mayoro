@@ -46,6 +46,8 @@ class PublicCatalogTest extends TestCase
     /**
      * HU-03: Navegación y consulta pública sin credenciales (Camino Feliz).
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_visitante_anonimo_consulta_el_catalogo_sin_iniciar_sesion
     public function test_visitante_anonimo_consulta_el_catalogo_sin_iniciar_sesion(): void
     {
         $this->producto();
@@ -60,6 +62,8 @@ class PublicCatalogTest extends TestCase
     /**
      * HU-03: El buscador filtra por nombre de producto.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_el_buscador_filtra_por_nombre_de_producto
     public function test_el_buscador_filtra_por_nombre_de_producto(): void
     {
         $this->producto(['nombre' => 'Arroz Costeño 50kg']);
@@ -80,6 +84,8 @@ class PublicCatalogTest extends TestCase
     /**
      * HU-03: El buscador también coincide contra la razón social del distribuidor.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_el_buscador_encuentra_por_razon_social_del_distribuidor
     public function test_el_buscador_encuentra_por_razon_social_del_distribuidor(): void
     {
         $this->producto();
@@ -93,6 +99,8 @@ class PublicCatalogTest extends TestCase
     /**
      * HU-03: El filtro por categoría acota el resultados del catálogo.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_el_filtro_por_categoria_acota_los_resultados
     public function test_el_filtro_por_categoria_acota_los_resultados(): void
     {
         $this->producto(['nombre' => 'Arroz Costeño 50kg', 'categoria' => 'Abarrotes']);
@@ -108,6 +116,8 @@ class PublicCatalogTest extends TestCase
     /**
      * HU-03: Paginación de 12 registros por página.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_el_catalogo_pagina_de_doce_en_doce_registros
     public function test_el_catalogo_pagina_de_doce_en_doce_registros(): void
     {
         Product::factory()->count(13)->create([
@@ -128,6 +138,8 @@ class PublicCatalogTest extends TestCase
     /**
      * HU-03: Transparencia de impuestos, el catálogo desglosa el IGV del 18%.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_el_catalogo_desglosa_el_igv_del_18_por_ciento
     public function test_el_catalogo_desglosa_el_igv_del_18_por_ciento(): void
     {
         $this->producto(['precio_bulto' => 100.00, 'unidades_por_bulto' => 1]);
@@ -143,6 +155,8 @@ class PublicCatalogTest extends TestCase
      * HU-03: Producto agotado, se muestra sin botón de compra y con la leyenda
      * "Temporalmente sin stock".
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_producto_sin_stock_se_marca_como_temporalmente_sin_stock
     public function test_producto_sin_stock_se_marca_como_temporalmente_sin_stock(): void
     {
         $this->producto(['nombre' => 'Leche evaporada 1L', 'stock_disponible' => 0]);
@@ -158,6 +172,8 @@ class PublicCatalogTest extends TestCase
     /**
      * HU-03: Producto pausado por el distribuidor, tampoco es comprable.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_producto_pausado_no_expone_el_boton_de_cotizar
     public function test_producto_pausado_no_expone_el_boton_de_cotizar(): void
     {
         $this->producto(['is_active' => false]);
@@ -171,6 +187,8 @@ class PublicCatalogTest extends TestCase
     /**
      * HU-03: El detalle del producto es público y muestra el desglose de IGV.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_el_detalle_del_producto_es_publico_y_muestra_el_igv
     public function test_el_detalle_del_producto_es_publico_y_muestra_el_igv(): void
     {
         $producto = $this->producto([
@@ -201,6 +219,8 @@ class PublicCatalogTest extends TestCase
      * enlazaba: pulsar la tarjeta llevaba a un enlace muerto y dejaba
      * inalcanzable el texto que explica al bodeguero la situación.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_un_producto_pausado_sigue_siendo_accesible_en_su_url_directa
     public function test_un_producto_pausado_sigue_siendo_accesible_en_su_url_directa(): void
     {
         $producto = $this->producto(['is_active' => false]);
@@ -215,6 +235,8 @@ class PublicCatalogTest extends TestCase
      * Un identificador que no existe sí debe seguir produciendo 404: la
      * diferencia entre producto pausado y producto inexistente importa.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_un_identificador_inexistente_sigue_dando_404
     public function test_un_identificador_inexistente_sigue_dando_404(): void
     {
         $this->get(route('products.show', 999999))->assertNotFound();
@@ -224,6 +246,8 @@ class PublicCatalogTest extends TestCase
      * HU-03: Redirección inteligente, el visitante recibe el returnUrl para
      * volver al producto que estaba consultando.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_el_visitante_es_redirigido_al_login_conservando_el_return_url
     public function test_el_visitante_es_redirigido_al_login_conservando_el_return_url(): void
     {
         $producto = $this->producto();
@@ -243,6 +267,8 @@ class PublicCatalogTest extends TestCase
      * HU-03: Ciclo completo, tras autenticarse el visitante vuelve al producto
      * que originó la redirección.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_tras_iniciar_sesion_el_visitante_vuelve_al_producto_de_origen
     public function test_tras_iniciar_sesion_el_visitante_vuelve_al_producto_de_origen(): void
     {
         $producto = $this->producto();
@@ -270,6 +296,8 @@ class PublicCatalogTest extends TestCase
     /**
      * HU-03: Seguridad, un returnUrl externo se descarta (open redirect).
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_descarta_un_return_url_externo_para_prevenir_open_redirect
     public function test_descarta_un_return_url_externo_para_prevenir_open_redirect(): void
     {
         $response = $this->get(route('auth.login', ['returnUrl' => 'https://sitio-malicioso.pe/robo']));
@@ -283,6 +311,8 @@ class PublicCatalogTest extends TestCase
      * HU-03: La ruta /products/create sigue reservada a distribuidores, no la
      * captura el comodín público {product}.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_la_ruta_de_creacion_no_es_capturada_por_el_comodin_publico
     public function test_la_ruta_de_creacion_no_es_capturada_por_el_comodin_publico(): void
     {
         $this->get(route('products.create'))->assertRedirect(route('login'));
@@ -291,6 +321,8 @@ class PublicCatalogTest extends TestCase
     /**
      * HU-03: La publicación de productos sigue protegida por RBAC.
      */
+
+    // php artisan test tests/Feature/PublicCatalogTest.php --filter=test_la_publicacion_de_productos_sigue_siendo_exclusiva_del_distribuidor
     public function test_la_publicacion_de_productos_sigue_siendo_exclusiva_del_distribuidor(): void
     {
         $bodega = User::create([

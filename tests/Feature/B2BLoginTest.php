@@ -25,6 +25,8 @@ class B2BLoginTest extends TestCase
     /**
      * HU-01: Camino feliz, el acceso se realiza contra la columna email_contacto.
      */
+
+    // php artisan test tests/Feature/B2BLoginTest.php --filter=test_inicia_sesion_con_el_correo_de_contacto_registrado
     public function test_inicia_sesion_con_el_correo_de_contacto_registrado(): void
     {
         $usuario = $this->usuario();
@@ -43,6 +45,8 @@ class B2BLoginTest extends TestCase
      * incorrecta el login debe mostrar el mensaje de validación, nunca lanzar
      * un error SQL de columna desconocida.
      */
+
+    // php artisan test tests/Feature/B2BLoginTest.php --filter=test_muestra_error_de_validacion_y_no_sql_error_con_contrasena_incorrecta
     public function test_muestra_error_de_validacion_y_no_sql_error_con_contrasena_incorrecta(): void
     {
         $this->usuario();
@@ -60,6 +64,8 @@ class B2BLoginTest extends TestCase
      * HU-01: Regresión — un correo inexistente tampoco debe consultar la columna
      * `email`, que no existe en el esquema B2B.
      */
+
+    // php artisan test tests/Feature/B2BLoginTest.php --filter=test_rechaza_un_correo_no_registrado_sin_error_de_base_de_datos
     public function test_rechaza_un_correo_no_registrado_sin_error_de_base_de_datos(): void
     {
         $response = $this->post(route('auth.login.post'), [
@@ -74,6 +80,8 @@ class B2BLoginTest extends TestCase
     /**
      * HU-01: La casilla de recordar sesión se respeta.
      */
+
+    // php artisan test tests/Feature/B2BLoginTest.php --filter=test_respeta_la_opcion_de_recordar_sesion
     public function test_respeta_la_opcion_de_recordar_sesion(): void
     {
         $usuario = $this->usuario();

@@ -21,6 +21,8 @@ class WaMeLinkGeneratorTest extends TestCase
      * When: se genera el enlace con un mensaje de una sola línea
      * Then: el enlace apunta a https://wa.me/51... con el texto codificado en %20
      */
+
+    // php artisan test tests/Unit/WaMeLinkGeneratorTest.php --filter=test_genera_enlace_wa_me_con_espacios_codificados_en_por_veinte
     public function test_genera_enlace_wa_me_con_espacios_codificados_en_por_veinte(): void
     {
         $link = $this->generator->generate('51987654321', 'Cotizacion de 10 bultos');
@@ -38,6 +40,8 @@ class WaMeLinkGeneratorTest extends TestCase
      * When: se genera el enlace
      * Then: cada salto de línea se codifica como %0A y no como %0D%0A
      */
+
+    // php artisan test tests/Unit/WaMeLinkGeneratorTest.php --filter=test_codifica_los_saltos_de_linea_como_por_veinte_a
     public function test_codifica_los_saltos_de_linea_como_por_veinte_a(): void
     {
         $link = $this->generator->generate('51987654321', "Linea uno\nLinea dos");
@@ -55,6 +59,8 @@ class WaMeLinkGeneratorTest extends TestCase
      * When: se genera el enlace
      * Then: se normaliza al formato E.164 peruano con prefijo 51
      */
+
+    // php artisan test tests/Unit/WaMeLinkGeneratorTest.php --filter=test_normaliza_telefono_local_de_nueve_digitos_con_prefijo_51
     public function test_normaliza_telefono_local_de_nueve_digitos_con_prefijo_51(): void
     {
         $this->assertSame('51987654321', $this->generator->normalizePhone('987654321'));
@@ -67,6 +73,8 @@ class WaMeLinkGeneratorTest extends TestCase
      * When: se consulta su validez
      * Then: solo los que resuelven a 51 seguido de 9 dígitos se consideran utilizables
      */
+
+    // php artisan test tests/Unit/WaMeLinkGeneratorTest.php --filter=test_valida_el_telefono_como_destino_de_whatsapp
     public function test_valida_el_telefono_como_destino_de_whatsapp(): void
     {
         $this->assertTrue($this->generator->isValidPhone('+51 987 654 321'));
@@ -81,6 +89,8 @@ class WaMeLinkGeneratorTest extends TestCase
      * When: se genera el enlace
      * Then: todo se codifica en UTF-8 y los separadores no rompen la query string
      */
+
+    // php artisan test tests/Unit/WaMeLinkGeneratorTest.php --filter=test_codifica_acentos_y_simbolos_reservados_en_utf8
     public function test_codifica_acentos_y_simbolos_reservados_en_utf8(): void
     {
         $link = $this->generator->generate('51987654321', 'Total: S/ 1,180.00 & IGV');

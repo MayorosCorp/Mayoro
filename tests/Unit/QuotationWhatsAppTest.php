@@ -16,6 +16,8 @@ class QuotationWhatsAppTest extends TestCase
         parent::tearDown();
     }
 
+    // php artisan test tests/Unit/QuotationWhatsAppTest.php --filter=test_genera_enlace_de_whatsapp_con_el_resumen_de_la_cotizacion
+
     public function test_genera_enlace_de_whatsapp_con_el_resumen_de_la_cotizacion(): void
     {
         // CA-03 — Given: un número de WhatsApp y un resumen de cotización válidos
