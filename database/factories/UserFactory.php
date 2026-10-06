@@ -34,7 +34,7 @@ class UserFactory extends Factory
             'ruc_empresa' => $ruc,
             'razon_social' => $razonSocial,
             'email_contacto' => Str::slug($razonSocial, '.').'@'.fake()->domainName(),
-            'telefono_whatsapp' => '51'.fake()->numerify('9########'),
+            'telefono_whatsapp' => '+51'.fake()->numerify('9########'),
             'direccion' => fake()->address(),
             'password' => static::$password ??= Hash::make('password'),
             'rol' => 'bodega',

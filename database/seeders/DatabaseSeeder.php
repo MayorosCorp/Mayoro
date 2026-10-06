@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             [
                 'razon_social' => 'Distribuidora Andina S.A.C.',
                 'email_contacto' => 'ventas@distribuidora-andina.pe',
-                'telefono_whatsapp' => '51987654321',
+                'telefono_whatsapp' => '+51987654321',
                 'direccion' => 'Av. Los Álamos 1450, Lima',
                 'password' => Hash::make('password'),
                 'rol' => 'distribuidor',
@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
             [
                 'razon_social' => 'Bodega El Comercio E.I.R.L.',
                 'email_contacto' => 'compras@bodegaelcomercio.pe',
-                'telefono_whatsapp' => '51911223344',
+                'telefono_whatsapp' => '+51911223344',
                 'direccion' => 'Jr. Garcilaso 210, Cusco',
                 'password' => Hash::make('password'),
                 'rol' => 'bodega',
