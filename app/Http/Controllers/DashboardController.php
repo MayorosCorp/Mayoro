@@ -13,37 +13,37 @@ class DashboardController extends Controller
     public function index(Request $request): View
     {
         $usuario = $request->user();
-        $esDistribuidor = $usuario->rol === 'distribuidor';
+        $esEmpresario = $usuario->esEmpresario();
 
         return view('dashboard.index', [
             'metricas' => [
-                // El distribuidor ve su propio catálogo; el bodeguero, el total
-                // publicado en la plataforma, que es lo que le compete.
-                'productos' => $esDistribuidor
+                // El Empresario ve su propio catalogo; la Persona Natural, el
+                // total publicado en la plataforma, que es lo que le compete.
+                'productos' => $esEmpresario
                     ? $usuario->productos()->count()
                     : Product::where('is_active', true)->count(),
-                'productosEtiqueta' => $esDistribuidor ? 'Productos publicados' : 'Productos en catálogo',
+                'productosEtiqueta' => $esEmpresario ? 'Productos publicados' : 'Productos en catálogo',
                 // Cada rol ve solo las cotizaciones que le pertenecen: el
-                // distribuidor las que recibio y el bodeguero las que genero.
+                // Empresario las que recibio y la Persona Natural las que genero.
                 'cotizaciones' => Quote::query()
                     ->where('estado', 'generada')
                     ->when(
-                        $esDistribuidor,
+                        $esEmpresario,
                         fn ($consulta) => $consulta->where('distribuidor_id', $usuario->id),
                         fn ($consulta) => $consulta->where('bodega_id', $usuario->id),
                     )
                     ->count(),
-                'cotizacionesEtiqueta' => $esDistribuidor
+                'cotizacionesEtiqueta' => $esEmpresario
                     ? 'Cotizaciones recibidas'
                     : 'Cotizaciones generadas',
-                'proveedores' => User::query()->where('rol', 'distribuidor')->count(),
-                // Un producto puede estar publicado y aun así no ser cotizable:
+                'proveedores' => User::query()->where('rol', User::ROL_EMPRESARIO)->count(),
+                // Un producto puede estar publicado y aun asi no ser cotizable:
                 // sin stock, con stock bajo el MOQ o pausado. Es la cifra que
                 // el comercio necesita revisar, no un contador de pedidos de un
-                // módulo que todavía no existe.
+                // modulo que todavia no existe.
                 'noCotizables' => Product::query()
                     ->when(
-                        $esDistribuidor,
+                        $esEmpresario,
                         fn ($consulta) => $consulta->where('distribuidor_id', $usuario->id)
                             ->where(function ($interno): void {
                                 $interno->where('is_active', false)
