@@ -64,6 +64,7 @@ class ProfileController extends Controller
         $user->forceFill([
             'ruc_empresa' => $validated['ruc_empresa'],
             'razon_social' => strip_tags(trim($validated['razon_social'])),
+            'slug' => $user->slug ?: User::generarSlugMicrositio($validated['razon_social']),
             'rubro' => strip_tags(trim($validated['rubro'])),
             'telefono_whatsapp' => '+51'.substr($phoneDigits, -9),
             'direccion' => isset($validated['direccion'])

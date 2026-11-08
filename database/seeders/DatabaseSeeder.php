@@ -24,7 +24,11 @@ class DatabaseSeeder extends Seeder
             [
                 'ruc_empresa' => '20123456786',
                 'razon_social' => 'Distribuidora Andina S.A.C.',
+                'slug' => 'distribuidora-andina',
                 'rubro' => 'Abarrotes y bebidas',
+                'descripcion' => 'Distribuimos abarrotes, bebidas y productos de limpieza para bodegas y minimarkets de Lima. Atendemos pedidos por bulto con entrega coordinada.',
+                'color_primario' => '#12305c',
+                'horario_atencion' => 'Lunes a viernes, 8:00 a 18:00',
                 'telefono_whatsapp' => '+51987654321',
                 'direccion' => 'Av. Los Álamos 1450, Lima',
                 'password' => Hash::make('password'),

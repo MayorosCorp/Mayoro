@@ -45,7 +45,8 @@
 
                 <p class="m-0 text-sm text-slate-600">
                     Publicado por
-                    <a class="font-semibold" href="{{ route('suppliers.show', $product->distribuidor_id) }}">
+                    <a class="font-semibold"
+                       href="{{ $product->distribuidor?->micrositio_url ?? route('suppliers.show', $product->distribuidor_id) }}">
                         {{ $product->distribuidor->razon_social ?? 'Distribuidor' }}
                     </a>
                 </p>

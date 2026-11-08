@@ -25,7 +25,8 @@ app/Http/Controllers/
 ├── AuthController.php        # Login, registro y logout
 ├── DashboardController.php   # Panel principal con métricas
 ├── ProductController.php     # CRUD de productos
-├── SupplierController.php    # CRUD de proveedores
+├── SupplierController.php    # Directorio y ficha de proveedores
+├── MicrositeController.php   # Vitrina pública del Empresario (RN-03)
 ├── QuoteController.php       # CRUD de cotizaciones
 ├── OrderController.php       # CRUD de pedidos
 ├── InventoryController.php   # Movimientos de stock
@@ -36,7 +37,8 @@ resources/views/
 ├── auth/                     # Login y registro
 ├── dashboard/                # Panel principal
 ├── products/                 # Índice, crear, editar, detalle
-├── suppliers/                # Índice, crear, editar, detalle
+├── suppliers/                # Directorio y catálogo del distribuidor
+├── microsite/                # Vitrina pública y edición del Empresario
 ├── quotes/                   # Índice, crear, editar, detalle
 ├── orders/                   # Índice, crear, editar, detalle
 ├── inventory/                # Índice, crear, editar
@@ -85,9 +87,11 @@ Abre `http://localhost:8000` en el navegador.
 Cuenta de prueba con datos de ejemplo, creada por el seeder:
 
 ```
-ventas@distribuidora-andina.pe / password   (distribuidor, puede publicar)
-compras@bodegaelcomercio.pe / password     (bodega, solo compra y cotiza)
+ventas@distribuidora-andina.pe / password   (Empresario, publica y edita su micrositio)
+compras@bodegaelcomercio.pe / password     (Persona natural, explora y cotiza)
 ```
+
+Micrositio de ejemplo: `http://localhost:8000/empresas/distribuidora-andina`.
 
 ## Estrategia de ramas: Gitflow
 

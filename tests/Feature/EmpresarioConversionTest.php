@@ -43,6 +43,9 @@ class EmpresarioConversionTest extends TestCase
             'telefono_whatsapp' => '+51987654321',
             'rol' => User::ROL_EMPRESARIO,
         ]);
+
+        // RN-03: el micrositio nace con un slug publico derivado de la razon social
+        $this->assertStringStartsWith('distribuidora-los-andes', $persona->fresh()->slug);
     }
 
     // php artisan test --filter=test_conversion_rechaza_ruc_con_digito_verificador_invalido
