@@ -3,28 +3,26 @@
 @section('title', 'Pedidos')
 
 @section('content')
-    <div style="display:flex; align-items:center; justify-content:space-between;">
-        <h1>Pedidos</h1>
-        <a class="btn" href="{{ route('orders.create') }}">Nuevo pedido</a>
-    </div>
+    <section class="mx-auto max-w-2xl">
+        <p class="section-eyebrow">Módulo en preparación</p>
+        <h1 class="mt-1 text-3xl font-semibold tracking-tight text-slate-900">Pedidos</h1>
+        <p class="mt-2 text-sm leading-6 text-slate-600">
+            El seguimiento de pedidos todavía no está disponible. Hasta que exista, la
+            operación comercial se cierra por WhatsApp a partir de la cotización.
+        </p>
 
-    <div class="card">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Cotización</th>
-                    <th>Proveedor</th>
-                    <th>Estado</th>
-                    <th>Fecha</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="6" style="text-align:center; color:#6b7280;">No hay pedidos registrados.</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <div class="card mt-6">
+            <h2 class="mt-0 text-lg font-semibold text-slate-900">¿Qué puedes hacer hoy?</h2>
+            <ul class="mt-2 space-y-2 text-sm leading-6 text-slate-600">
+                <li>Explorar el catálogo mayorista y comparar precios por bulto.</li>
+                <li>Generar una cotización y enviarla al distribuidor por WhatsApp.</li>
+                <li>Revisar el historial de tus cotizaciones desde tu cuenta.</li>
+            </ul>
+
+            <div class="mt-5 flex flex-wrap gap-3">
+                <a class="btn" href="{{ route('products.index') }}">Ver catálogo</a>
+                <a class="btn ghost" href="{{ route('quotes.index') }}">Mis cotizaciones</a>
+            </div>
+        </div>
+    </section>
 @endsection

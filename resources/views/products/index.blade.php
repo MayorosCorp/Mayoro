@@ -1,29 +1,36 @@
 @extends('layouts.app')
 
-@section('title', 'Catálogo Mayorista')
+@section('title', 'Catálogo mayorista')
 
 @section('content')
-    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+    <section class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h1 style="margin-bottom:.25rem;">Catálogo Mayorista</h1>
-            <p style="color:#6b7280; margin:0; font-size:.95rem;">
-                Explora precios por bulto, presentación y pedido mínimo (MOQ) de los distribuidores
-                registrados. Los precios se muestran sin IGV; el impuesto se desglosa en cada producto.
+            <p class="section-eyebrow">Catálogo público</p>
+            <h1 class="mt-1 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                Catálogo mayorista
+            </h1>
+            <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                Precios por bulto, unidades por empaque y pedido mínimo (MOQ) de los distribuidores
+                registrados. Los importes se muestran sin IGV y el impuesto se desglosa en cada producto.
             </p>
         </div>
 
         @if (Auth::check() && Auth::user()->rol === 'distribuidor')
-            <a class="btn" href="{{ route('products.create') }}">+ Publicar Nuevo Producto</a>
+            <a class="btn accent shrink-0" href="{{ route('products.create') }}" data-testid="catalogo-publicar">
+                + Publicar Nuevo Producto
+            </a>
         @endif
-    </div>
+    </section>
 
     {{-- Ficha CI-COD-10: buscador por texto y filtro por categoría (HU-03) --}}
-    <form method="GET" action="{{ route('products.index') }}" class="card" style="margin-top:1.5rem;">
-        <div style="display:grid; grid-template-columns:2fr 1fr auto; gap:1rem; align-items:end;">
+    <form method="GET" action="{{ route('products.index') }}"
+          class="card mt-6"
+          data-testid="catalogo-filtros">
+        <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-[2fr_1fr_auto]">
             <div>
                 <label for="q">Buscar producto</label>
                 <input id="q" type="search" name="q" value="{{ $busqueda }}"
-                   placeholder="Nombre, descripción, presentación o distribuidor...">
+                       placeholder="Nombre, descripción, presentación o distribuidor...">
             </div>
             <div>
                 <label for="categoria">Categoría</label>
@@ -34,7 +41,7 @@
                     @endforeach
                 </select>
             </div>
-            <div style="display:flex; gap:.5rem;">
+            <div class="flex gap-2">
                 <button class="btn" type="submit">Filtrar</button>
                 @if ($busqueda !== '' || $categoria !== '')
                     <a class="btn ghost" href="{{ route('products.index') }}">Limpiar</a>
@@ -43,84 +50,114 @@
         </div>
     </form>
 
-    <p style="color:#6b7280; font-size:.85rem; margin-top:1rem;">
-        {{ $products->total() }} producto(s) encontrado(s)
-        @if ($busqueda !== '') &middot; texto: <strong>{{ $busqueda }}</strong> @endif
-        @if ($categoria !== '') &middot; categoría: <strong>{{ $categoria }}</strong> @endif
-    </p>
+    <div class="mt-5 flex flex-wrap items-center gap-2 text-sm text-slate-600">
+        <span class="font-semibold text-slate-800">{{ $products->total() }}</span>
+        <span>producto(s) encontrado(s)</span>
 
-    <div class="grid" style="margin-top:1rem;">
+        @if ($busqueda !== '')
+            <span class="badge badge-brand">texto: {{ $busqueda }}</span>
+        @endif
+
+        @if ($categoria !== '')
+            <span class="badge badge-brand">categoría: {{ $categoria }}</span>
+        @endif
+    </div>
+
+    <div class="card-grid mt-4">
         @forelse ($products as $prod)
-            <article class="card" style="display:flex; flex-direction:column; gap:.5rem; {{ $prod->esta_agotado ? 'opacity:.65;' : '' }}">
-                @if ($prod->imagen_url)
-                    <img src="{{ Storage::disk('public')->url($prod->imagen_url) }}" alt="{{ $prod->nombre }}"
-                         style="width:100%; height:120px; object-fit:cover; border-radius:.375rem; border:1px solid #e5e7eb;">
-                @else
-                    <div style="width:100%; height:120px; border-radius:.375rem; background:#f3f4f6;
-                                display:flex; align-items:center; justify-content:center; color:#9ca3af; font-size:.8rem;">
-                        Sin imagen
-                    </div>
-                @endif
+            <article class="card card-hover flex flex-col gap-3 {{ $prod->esta_agotado ? 'bg-slate-50/80' : '' }}"
+                     data-testid="producto-card">
+                <div class="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                    @if ($prod->imagen_url)
+                        <img src="{{ Storage::disk('public')->url($prod->imagen_url) }}" alt="{{ $prod->nombre }}"
+                             class="h-40 w-full object-cover" loading="lazy">
+                    @else
+                        <div class="grid h-40 w-full place-items-center text-xs font-medium uppercase tracking-wide text-slate-400">
+                            Sin imagen
+                        </div>
+                    @endif
 
-                <span style="font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:#6b7280;">
-                    {{ $prod->categoria }}
-                </span>
-
-                <a href="{{ route('products.show', $prod->id) }}"
-                   style="font-weight:700; font-size:1rem; text-decoration:none; color:#1f2937;">
-                    {{ $prod->nombre }}
-                </a>
-
-                <span style="font-size:.82rem; color:#6b7280;">
-                    {{ $prod->presentacion }} &middot; {{ $prod->unidades_por_bulto }} und. por bulto
-                </span>
-
-                <div>
-                    <span style="font-size:1.25rem; font-weight:700; color:#12305c;">
-                        S/ {{ number_format($prod->precio_unitario_calculado, 2) }}
-                    </span>
-                    <span style="display:block; font-size:.75rem; color:#6b7280;">
-                        por unidad &middot; bulto S/ {{ number_format((float) $prod->precio_bulto, 2) }}
-                    </span>
-                    <span style="display:block; font-size:.75rem; color:#166534;">
-                        IGV 18%: S/ {{ number_format($prod->precio_unitario_calculado * 0.18, 2) }}
-                        &middot; total S/ {{ number_format($prod->precio_unitario_calculado * 1.18, 2) }}
-                    </span>
+                    <span class="absolute left-2 top-2 badge badge-brand bg-white/95">{{ $prod->categoria }}</span>
                 </div>
 
-                <span style="font-size:.75rem;">
-                    <span style="background:#fffbeb; color:#92400e; border:1px solid #fde68a;
-                                 border-radius:999px; padding:.1rem .55rem;">
-                        MOQ: {{ $prod->moq_cantidad_minima }} bultos
-                    </span>
-                </span>
+                <div class="flex flex-1 flex-col gap-2">
+                    <a href="{{ route('products.show', $prod->id) }}"
+                       class="text-base font-semibold leading-snug text-slate-900 no-underline hover:text-brand-700">
+                        {{ $prod->nombre }}
+                    </a>
 
-                @if ($prod->esta_agotado)
-                    {{-- La leyenda es la exigida por HU-03; el motivo se aclara aparte --}}
-                    <span class="btn disabled" aria-disabled="true">Temporalmente sin stock</span>
-                    @if ($prod->estado_stock === 'pausado')
-                        <span style="font-size:.72rem; color:#9ca3af;">Pausado por el distribuidor</span>
+                    <p class="m-0 text-xs leading-5 text-slate-500">
+                        {{ $prod->presentacion }} &middot; {{ $prod->unidades_por_bulto }} und. por bulto
+                    </p>
+
+                    <div class="mt-1">
+                        <p class="m-0 flex items-baseline gap-1.5">
+                            <span class="price-bulto">S/ {{ number_format((float) $prod->precio_bulto, 2) }}</span>
+                            <span class="text-xs font-medium text-slate-500">/ bulto</span>
+                        </p>
+                        <p class="m-0 text-xs text-slate-500">
+                            Unitario referencial: S/ {{ number_format($prod->precio_unitario_calculado, 2) }}
+                        </p>
+                        <p class="m-0 text-xs font-medium text-emerald-700">
+                            IGV 18%: S/ {{ number_format((float) $prod->precio_bulto * 0.18, 2) }}
+                            &middot; total S/ {{ number_format((float) $prod->precio_bulto * 1.18, 2) }}
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="badge badge-accent">MOQ: {{ $prod->moq_cantidad_minima }} bultos</span>
+
+                        @if ($prod->esta_agotado)
+                            <span class="badge badge-muted" data-testid="producto-estado">{{ $prod->etiqueta_estado_stock }}</span>
+                        @else
+                            <span class="badge badge-success" data-testid="producto-estado">
+                                Disponible: {{ $prod->stock_disponible }} bultos
+                            </span>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="mt-auto space-y-2">
+                    @if ($prod->esta_agotado)
+                        {{-- La leyenda es la exigida por HU-03; el motivo se aclara aparte --}}
+                        <span class="btn disabled w-full" aria-disabled="true" data-testid="producto-sin-stock">
+                            Temporalmente sin stock
+                        </span>
+                        @if ($prod->estado_stock === 'pausado')
+                            <p class="m-0 text-center text-xs text-slate-500">Pausado por el distribuidor</p>
+                        @elseif ($prod->estado_stock === 'stock_insuficiente')
+                            <p class="m-0 text-center text-xs text-slate-500">Stock insuficiente para el pedido mínimo</p>
+                        @endif
+                    @elseif (Auth::check() && Auth::user()->rol === 'bodega')
+                        <a class="btn w-full" href="{{ route('quotes.create', ['producto' => $prod->id]) }}"
+                           data-testid="producto-cotizar">
+                            Cotizar pedido
+                        </a>
+                    @elseif (Auth::check())
+                        <a class="btn ghost w-full" href="{{ route('products.show', $prod->id) }}">
+                            Ver detalle
+                        </a>
+                    @else
+                        {{-- Ficha CI-COD-13: cada tarjeta declara su propio returnUrl --}}
+                        <button class="btn w-full" type="button" data-modal-abrir="authModal"
+                                data-return-url="{{ route('products.show', $prod->id) }}">
+                            Ingresar para cotizar
+                        </button>
                     @endif
-                @elseif (Auth::check() && Auth::user()->rol === 'bodega')
-                    <a class="btn" href="{{ route('quotes.create', ['producto' => $prod->id]) }}">Cotizar pedido</a>
-                @elseif (Auth::check())
-                    <span style="font-size:.8rem; color:#6b7280;">Solo bodegas cotizan</span>
-                @else
-                    {{-- Ficha CI-COD-13: cada tarjeta declara su propio returnUrl --}}
-                    <button class="btn" type="button" data-modal-abrir="authModal"
-                            data-return-url="{{ route('products.show', $prod->id) }}">
-                        Ingresar para cotizar
-                    </button>
-                @endif
 
-                <span style="font-size:.75rem; color:#6b7280;">
-                    {{ $prod->distribuidor->razon_social ?? 'Distribuidor' }}
-                </span>
+                    @if (Auth::check() && Auth::user()->rol === 'distribuidor' && $prod->distribuidor_id === Auth::id())
+                        <a class="btn ghost w-full" href="{{ route('products.edit', $prod->id) }}">Editar producto</a>
+                    @endif
+
+                    <p class="m-0 text-center text-xs text-slate-500">
+                        {{ $prod->distribuidor->razon_social ?? 'Distribuidor' }}
+                    </p>
+                </div>
             </article>
         @empty
-            <div class="card">
-                <h3 style="margin-top:0;">No encontramos productos con esos criterios</h3>
-                <p style="color:#6b7280; margin:0;">
+            <div class="card col-span-full">
+                <h2 class="mt-0 text-lg font-semibold">No encontramos productos con esos criterios</h2>
+                <p class="mb-0 text-sm text-slate-600">
                     Prueba con otro término de búsqueda o
                     <a href="{{ route('products.index') }}">muestra todo el catálogo</a>.
                 </p>
@@ -129,7 +166,7 @@
     </div>
 
     @if ($products->hasPages())
-        <div style="margin-top:2rem;">{{ $products->links() }}</div>
+        <div class="mt-8">{{ $products->links() }}</div>
     @endif
 
     @guest

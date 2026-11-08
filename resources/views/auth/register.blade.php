@@ -3,59 +3,122 @@
 @section('title', 'Registro B2B')
 
 @section('content')
-    <div class="card" style="max-width:520px; margin:0 auto;">
-        <h1>Registro Comercial B2B</h1>
-        <p style="color:#666; margin-bottom:1.5rem; font-size:0.95rem;">
-            Únete a la red mayorista para bodegas y distribuidores.
-        </p>
+    <div class="mx-auto max-w-xl">
+        <header>
+            <p class="section-eyebrow">Red mayorista</p>
+            <h1 class="mt-1 text-3xl font-semibold tracking-tight text-slate-900">
+                Registro comercial B2B
+            </h1>
+            <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                Únete a la red mayorista para bodegas y distribuidores. El RUC se valida con
+                el dígito verificador del Módulo 11.
+            </p>
+        </header>
 
         @if ($errors->any())
-            <div style="background:#fee2e2; border:1px solid #ef4444; color:#b91c1c; padding:0.75rem 1rem; border-radius:6px; margin-bottom:1.5rem;">
-                <ul style="margin:0; padding-left:1.2rem;">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+            <div class="flash error mt-6" role="alert">
+                <div>
+                    <p class="m-0 font-semibold">Por favor corrige los siguientes errores:</p>
+                    <ul class="error-list mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
         @endif
 
-        <form method="POST" action="{{ route('auth.register.post') }}">
+        <form method="POST" action="{{ route('auth.register.post') }}" class="card mt-6"
+              data-testid="registro-form">
             @csrf
 
-            <label for="rol">Tipo de Comercio (Rol)</label>
-            <select id="rol" name="rol" required style="width:100%; padding:0.5rem; margin-bottom:1rem; border:1px solid #ccc; border-radius:4px;">
-                <option value="bodega" {{ old('rol') === 'bodega' ? 'selected' : '' }}>Comerciante Minorista (Bodega)</option>
-                <option value="distribuidor" {{ old('rol') === 'distribuidor' ? 'selected' : '' }}>Distribuidor Mayorista</option>
-            </select>
+            <fieldset class="m-0 border-0 p-0">
+                <legend class="text-base font-semibold text-slate-900">Tipo de comercio</legend>
 
-            <label for="ruc_empresa">RUC (11 dígitos)</label>
-            <input id="ruc_empresa" type="text" name="ruc_empresa" value="{{ old('ruc_empresa') }}" maxlength="11" placeholder="Ej. 20601234567" required>
+                <div class="mt-4">
+                    <label for="rol">Tipo de Comercio (Rol)</label>
+                    <select id="rol" name="rol" required>
+                        <option value="bodega" @selected(old('rol') === 'bodega')>
+                            Comerciante Minorista (Bodega)
+                        </option>
+                        <option value="distribuidor" @selected(old('rol') === 'distribuidor')>
+                            Distribuidor Mayorista
+                        </option>
+                    </select>
+                    <span class="field-hint">
+                        La bodega cotiza y compra; el distribuidor además publica productos.
+                    </span>
+                </div>
+            </fieldset>
 
-            <label for="razon_social">Razón Social / Nombre Comercial</label>
-            <input id="razon_social" type="text" name="razon_social" value="{{ old('razon_social') }}" placeholder="Ej. Distribuidora Los Andes S.A.C." required>
+            <hr class="my-6 border-slate-200">
 
-            <label for="email_contacto">Correo Electrónico de Contacto</label>
-            <input id="email_contacto" type="email" name="email_contacto" value="{{ old('email_contacto') }}" placeholder="contacto@empresa.pe" required>
+            <fieldset class="m-0 border-0 p-0">
+                <legend class="text-base font-semibold text-slate-900">Datos del comercio</legend>
 
-            <label for="telefono_whatsapp">Teléfono con WhatsApp (9 dígitos móviles)</label>
-            <input id="telefono_whatsapp" type="text" name="telefono_whatsapp" value="{{ old('telefono_whatsapp') }}" maxlength="12" placeholder="Ej. 987654321" required>
+                <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="ruc_empresa">RUC (11 dígitos)</label>
+                        <input id="ruc_empresa" type="text" name="ruc_empresa"
+                               value="{{ old('ruc_empresa') }}" maxlength="11"
+                               inputmode="numeric" placeholder="Ej. 20601234567" required>
+                    </div>
+                    <div>
+                        <label for="telefono_whatsapp">Teléfono con WhatsApp</label>
+                        <input id="telefono_whatsapp" type="text" name="telefono_whatsapp"
+                               value="{{ old('telefono_whatsapp') }}" maxlength="12"
+                               inputmode="tel" placeholder="Ej. 987654321" required>
+                        <span class="field-hint">9 dígitos móviles; añadimos el prefijo +51.</span>
+                    </div>
+                </div>
 
-            <label for="direccion">Dirección Comercial (Opcional)</label>
-            <input id="direccion" type="text" name="direccion" value="{{ old('direccion') }}" placeholder="Av. Los Comerciantes 123">
+                <div class="mt-4">
+                    <label for="razon_social">Razón Social / Nombre Comercial</label>
+                    <input id="razon_social" type="text" name="razon_social"
+                           value="{{ old('razon_social') }}"
+                           placeholder="Ej. Distribuidora Los Andes S.A.C." required>
+                </div>
 
-            <label for="password">Contraseña (Mínimo 8 caracteres)</label>
-            <input id="password" type="password" name="password" required>
+                <div class="mt-4">
+                    <label for="email_contacto">Correo Electrónico de Contacto</label>
+                    <input id="email_contacto" type="email" name="email_contacto"
+                           value="{{ old('email_contacto') }}" autocomplete="email"
+                           placeholder="contacto@empresa.pe" required>
+                </div>
 
-            <label for="password_confirmation">Confirmar Contraseña</label>
-            <input id="password_confirmation" type="password" name="password_confirmation" required>
+                <div class="mt-4">
+                    <label for="direccion">Dirección Comercial (Opcional)</label>
+                    <input id="direccion" type="text" name="direccion" value="{{ old('direccion') }}"
+                           autocomplete="street-address" placeholder="Av. Los Comerciantes 123">
+                </div>
+            </fieldset>
 
-            <div style="margin-top:1.5rem;">
-                <button class="btn" type="submit" style="width:100%;">Crear Cuenta Comercial</button>
-            </div>
+            <hr class="my-6 border-slate-200">
+
+            <fieldset class="m-0 border-0 p-0">
+                <legend class="text-base font-semibold text-slate-900">Acceso</legend>
+
+                <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="password">Contraseña (Mínimo 8 caracteres)</label>
+                        <input id="password" type="password" name="password"
+                               autocomplete="new-password" required>
+                    </div>
+                    <div>
+                        <label for="password_confirmation">Confirmar Contraseña</label>
+                        <input id="password_confirmation" type="password" name="password_confirmation"
+                               autocomplete="new-password" required>
+                    </div>
+                </div>
+            </fieldset>
+
+            <button class="btn mt-8 w-full" type="submit">Crear Cuenta Comercial</button>
         </form>
 
-        <p style="margin-top:1.2rem; font-size:.9rem; text-align:center;">
-            ¿Ya tienes cuenta comercial? <a href="{{ route('auth.login') }}">Inicia sesión</a>
+        <p class="mt-6 text-center text-sm text-slate-600">
+            ¿Ya tienes cuenta comercial?
+            <a href="{{ route('auth.login', array_filter(['returnUrl' => $returnUrl ?? null])) }}"
+               class="font-semibold text-brand-700">Inicia sesión</a>
         </p>
     </div>
 @endsection

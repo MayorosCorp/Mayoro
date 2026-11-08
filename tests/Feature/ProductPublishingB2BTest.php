@@ -17,6 +17,7 @@ class ProductPublishingB2BTest extends TestCase
     // php artisan test --filter=test_distribuidor_puede_publicar_producto_con_condiciones_mayoristas_camino_feliz
     public function test_distribuidor_puede_publicar_producto_con_condiciones_mayoristas_camino_feliz(): void
     {
+        // HU-02 — Given: un distribuidor mayorista registrado con datos válidos
         $distribuidor = User::create([
             'ruc_empresa' => '20601234567',
             'razon_social' => 'Distribuidora Central S.A.C.',
@@ -38,8 +39,10 @@ class ProductPublishingB2BTest extends TestCase
             'descripcion' => 'Caja sellada de 12 botellas de 1L cada una.',
         ];
 
+        // When: publica un producto con condiciones mayoristas válidas
         $response = $this->actingAs($distribuidor)->post(route('products.store'), $payload);
 
+        // Then: el producto queda activo en el catálogo y se redirige al listado con mensaje de éxito
         $response->assertRedirect(route('products.index'));
         $response->assertSessionHas('success');
 
@@ -64,6 +67,7 @@ class ProductPublishingB2BTest extends TestCase
     // php artisan test --filter=test_rechaza_publicacion_con_precio_o_moq_menor_o_igual_a_cero
     public function test_rechaza_publicacion_con_precio_o_moq_menor_o_igual_a_cero(): void
     {
+        // HU-02 — Given: un distribuidor mayorista registrado y un payload con precio y MOQ en cero
         $distribuidor = User::create([
             'ruc_empresa' => '20601234567',
             'razon_social' => 'Distribuidora Central S.A.C.',
@@ -83,8 +87,10 @@ class ProductPublishingB2BTest extends TestCase
             'stock_disponible' => 100,
         ];
 
+        // When: intenta publicar el producto con esos valores inválidos
         $response = $this->actingAs($distribuidor)->post(route('products.store'), $payload);
 
+        // Then: se muestran errores de validación en precio y MOQ y no se persiste ningún producto
         $response->assertSessionHasErrors(['precio_bulto', 'moq_cantidad_minima']);
         $this->assertDatabaseCount('productos_mayoristas', 0);
 
@@ -101,6 +107,7 @@ class ProductPublishingB2BTest extends TestCase
     // php artisan test --filter=test_bloquea_publicacion_a_usuario_con_rol_bodega_con_http_403_rbac
     public function test_bloquea_publicacion_a_usuario_con_rol_bodega_con_http_403_rbac(): void
     {
+        // HU-02 — Given: un usuario autenticado con rol "bodega" (no distribuidor)
         $bodega = User::create([
             'ruc_empresa' => '10456789012',
             'razon_social' => 'Bodega Don Pepe',
@@ -120,8 +127,10 @@ class ProductPublishingB2BTest extends TestCase
             'stock_disponible' => 48,
         ];
 
+        // When: intenta publicar un producto válido
         $response = $this->actingAs($bodega)->post(route('products.store'), $payload);
 
+        // Then: el servidor responde HTTP 403 y no se crea ningún producto
         $response->assertForbidden();
         $this->assertDatabaseCount('productos_mayoristas', 0);
     }
@@ -133,6 +142,7 @@ class ProductPublishingB2BTest extends TestCase
     // php artisan test --filter=test_bloquea_publicacion_a_visitante_no_autenticado
     public function test_bloquea_publicacion_a_visitante_no_autenticado(): void
     {
+        // HU-02 — Given: un visitante no autenticado con un payload de producto válido
         $payload = [
             'nombre' => 'Leche Gloria Caja x 24',
             'categoria' => 'Lácteos',
@@ -143,8 +153,10 @@ class ProductPublishingB2BTest extends TestCase
             'stock_disponible' => 60,
         ];
 
+        // When: intenta publicar el producto sin iniciar sesión
         $response = $this->post(route('products.store'), $payload);
 
+        // Then: es redirigido al login y no se crea ningún producto
         $response->assertRedirect(route('login'));
         $this->assertDatabaseCount('productos_mayoristas', 0);
     }
@@ -156,6 +168,7 @@ class ProductPublishingB2BTest extends TestCase
     // php artisan test --filter=test_sanitiza_campos_de_texto_del_producto_contra_xss
     public function test_sanitiza_campos_de_texto_del_producto_contra_xss(): void
     {
+        // HU-02 — Given: un distribuidor mayorista registrado y un payload con etiquetas HTML maliciosas
         $distribuidor = User::create([
             'ruc_empresa' => '20601234567',
             'razon_social' => 'Distribuidora Central S.A.C.',
@@ -176,8 +189,10 @@ class ProductPublishingB2BTest extends TestCase
             'descripcion' => "<script>window.location='malicious.com'</script>Saco de azúcar pura.",
         ];
 
+        // When: publica el producto con esos campos de texto
         $response = $this->actingAs($distribuidor)->post(route('products.store'), $payload);
 
+        // Then: las etiquetas HTML se eliminan y el producto se guarda con el texto limpio
         $response->assertRedirect(route('products.index'));
 
         $this->assertDatabaseHas('productos_mayoristas', [
@@ -198,6 +213,7 @@ class ProductPublishingB2BTest extends TestCase
     // php artisan test --filter=test_rechaza_publicacion_con_precio_de_mas_de_dos_decimales
     public function test_rechaza_publicacion_con_precio_de_mas_de_dos_decimales(): void
     {
+        // HU-02 — Given: un distribuidor mayorista registrado y un payload con precio de tres decimales
         $distribuidor = User::create([
             'ruc_empresa' => '20601234567',
             'razon_social' => 'Distribuidora Central S.A.C.',
@@ -217,8 +233,10 @@ class ProductPublishingB2BTest extends TestCase
             'stock_disponible' => 40,
         ];
 
+        // When: intenta publicar el producto con ese precio
         $response = $this->actingAs($distribuidor)->post(route('products.store'), $payload);
 
+        // Then: se muestran errores de validación en el precio y no se persiste ningún producto
         $response->assertSessionHasErrors('precio_bulto');
         $this->assertDatabaseCount('productos_mayoristas', 0);
     }

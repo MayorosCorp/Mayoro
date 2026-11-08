@@ -28,19 +28,19 @@
     $rutaInicial = $returnUrl ?? route('products.index');
 @endphp
 
-<div class="modal-overlay" id="authModal" hidden>
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitulo">
-        <h2 id="authModalTitulo" style="margin:0 0 .5rem 0; font-size:1.15rem;">
+<div class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-6" id="authModal" hidden>
+    <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="authModalTitulo">
+        <h2 id="authModalTitulo" class="mt-0 text-xl font-semibold tracking-tight text-slate-900">
             Inicia sesión para cotizar
         </h2>
 
-        <p style="margin:0 0 1rem 0; color:#4b5563; font-size:.9rem;">
+        <p class="mb-5 mt-2 text-sm leading-6 text-slate-600">
             El catálogo mayorista es público, pero la cotización requiere una cuenta de
             comercio registrada con RUC y WhatsApp. Te devolvemos al producto que estabas
             viendo al terminar.
         </p>
 
-        <div style="display:flex; gap:.6rem; flex-wrap:wrap;">
+        <div class="flex flex-wrap gap-2">
             {{--
                 data-modal-base guarda la ruta SIN query string. El href visible
                 ya trae el returnUrl por si el visitante navega sin JavaScript, y
@@ -60,20 +60,6 @@
     </div>
 </div>
 
-<style>
-    .modal-overlay {
-        position: fixed; inset: 0; background: rgba(15, 23, 42, .55);
-        display: flex; align-items: center; justify-content: center;
-        padding: 1.5rem; z-index: 50;
-    }
-    .modal-overlay[hidden] { display: none; }
-    .modal {
-        background: #fff; border-radius: .6rem; padding: 1.5rem;
-        max-width: 460px; width: 100%;
-        box-shadow: 0 20px 45px rgba(0, 0, 0, .3);
-    }
-</style>
-
 <script>
     (function () {
         var modal = document.getElementById('authModal');
@@ -83,6 +69,7 @@
             login: modal.querySelector('[data-modal-destino="login"]'),
             register: modal.querySelector('[data-modal-destino="register"]')
         };
+        var ultimoFoco = null;
 
         function abrir(disparador) {
             // En la cuadricula cada tarjeta declara su propio destino. Se
@@ -97,14 +84,38 @@
                 });
             }
 
+            ultimoFoco = document.activeElement;
             modal.hidden = false;
+            document.body.style.overflow = 'hidden';
             var foco = modal.querySelector('a, button');
             if (foco) { foco.focus(); }
         }
 
         function cerrar() {
             modal.hidden = true;
+            document.body.style.overflow = '';
+            if (ultimoFoco && ultimoFoco.focus) { ultimoFoco.focus(); }
+            ultimoFoco = null;
         }
+
+        // El foco no debe escapar del dialogo mientras esta abierto.
+        modal.addEventListener('keydown', function (evento) {
+            if (evento.key !== 'Tab') { return; }
+
+            var enfocables = modal.querySelectorAll('a[href], button:not([disabled])');
+            if (! enfocables.length) { return; }
+
+            var primero = enfocables[0];
+            var ultimo = enfocables[enfocables.length - 1];
+
+            if (evento.shiftKey && document.activeElement === primero) {
+                evento.preventDefault();
+                ultimo.focus();
+            } else if (! evento.shiftKey && document.activeElement === ultimo) {
+                evento.preventDefault();
+                primero.focus();
+            }
+        });
 
         document.querySelectorAll('[data-modal-abrir="authModal"]').forEach(function (disparador) {
             disparador.addEventListener('click', function (evento) {

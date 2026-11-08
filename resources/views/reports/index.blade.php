@@ -3,29 +3,25 @@
 @section('title', 'Reportes')
 
 @section('content')
-    <h1>Reportes</h1>
+    <section class="mx-auto max-w-2xl">
+        <p class="section-eyebrow">Módulo en preparación</p>
+        <h1 class="mt-1 text-3xl font-semibold tracking-tight text-slate-900">Reportes</h1>
+        <p class="mt-2 text-sm leading-6 text-slate-600">
+            La generación de reportes todavía no está disponible. Mientras tanto, el dashboard
+            resume el catálogo y las cotizaciones de tu cuenta.
+        </p>
 
-    <div class="card" style="max-width:640px;">
-        <form method="POST" action="{{ route('reports.generate') }}">
-            @csrf
+        <div class="card mt-6">
+            <h2 class="mt-0 text-lg font-semibold text-slate-900">Datos disponibles hoy</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-600">
+                El panel de trabajo muestra productos publicados, cotizaciones generadas,
+                distribuidores registrados y productos que hoy no se pueden cotizar.
+            </p>
 
-            <label for="type">Tipo de reporte</label>
-            <select id="type" name="type">
-                <option value="quotes">Cotizaciones</option>
-                <option value="orders">Pedidos</option>
-                <option value="inventory">Inventario</option>
-                <option value="suppliers">Proveedores</option>
-            </select>
-
-            <label for="from">Desde</label>
-            <input id="from" type="date" name="from">
-
-            <label for="to">Hasta</label>
-            <input id="to" type="date" name="to">
-
-            <div style="margin-top:1.2rem;">
-                <button class="btn" type="submit">Generar reporte</button>
+            <div class="mt-5 flex flex-wrap gap-3">
+                <a class="btn" href="{{ route('dashboard.index') }}">Ver dashboard</a>
+                <a class="btn ghost" href="{{ route('quotes.index') }}">Mis cotizaciones</a>
             </div>
-        </form>
-    </div>
+        </div>
+    </section>
 @endsection

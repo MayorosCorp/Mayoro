@@ -3,20 +3,25 @@
 @section('title', 'Distribuidores')
 
 @section('content')
-    <h1 style="margin-bottom:.25rem;">Distribuidores mayoristas</h1>
-    <p style="color:#6b7280; margin:0 0 1.5rem 0; font-size:.95rem;">
-        Comercios verificados que publican productos con precio por bulto y pedido mínimo
-        en el catálogo de Mayoro.
-    </p>
+    <section>
+        <p class="section-eyebrow">Directorio B2B</p>
+        <h1 class="mt-1 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+            Distribuidores mayoristas
+        </h1>
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            Comercios verificados que publican productos con precio por bulto y pedido mínimo
+            en el catálogo de Mayoro.
+        </p>
+    </section>
 
-    <form method="GET" action="{{ route('suppliers.index') }}" class="card">
-        <div style="display:grid; grid-template-columns:2fr auto; gap:1rem; align-items:end;">
+    <form method="GET" action="{{ route('suppliers.index') }}" class="card mt-6">
+        <div class="grid grid-cols-1 items-end gap-4 md:grid-cols-[2fr_auto]">
             <div>
                 <label for="q">Buscar distribuidor</label>
                 <input id="q" type="search" name="q" value="{{ $busqueda }}"
                        placeholder="Razón social o RUC...">
             </div>
-            <div style="display:flex; gap:.5rem;">
+            <div class="flex gap-2">
                 <button class="btn" type="submit">Buscar</button>
                 @if ($busqueda !== '')
                     <a class="btn ghost" href="{{ route('suppliers.index') }}">Limpiar</a>
@@ -25,40 +30,44 @@
         </div>
     </form>
 
-    <div class="grid" style="margin-top:1.5rem;">
+    <div class="mt-5 flex flex-wrap items-center gap-2 text-sm text-slate-600">
+        <span class="font-semibold text-slate-800">{{ $distribuidores->total() }}</span>
+        <span>distribuidor(es) registrado(s)</span>
+
+        @if ($busqueda !== '')
+            <span class="badge badge-brand">búsqueda: {{ $busqueda }}</span>
+        @endif
+    </div>
+
+    <div class="card-grid mt-4">
         @forelse ($distribuidores as $distribuidor)
-            <article class="card" style="display:flex; flex-direction:column; gap:.4rem;">
-                <span style="font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:#6b7280;">
-                    RUC {{ $distribuidor->ruc_empresa }}
-                </span>
+            <article class="card card-hover flex flex-col gap-3" data-testid="distribuidor-card">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="badge badge-muted">RUC {{ $distribuidor->ruc_empresa }}</span>
+
+                    @if ($distribuidor->is_premium)
+                        <span class="badge badge-accent">Distribuidor Premium</span>
+                    @endif
+                </div>
 
                 <a href="{{ route('suppliers.show', $distribuidor->id) }}"
-                   style="font-weight:700; font-size:1.05rem; text-decoration:none; color:#1f2937;">
+                   class="break-words text-lg font-semibold leading-snug text-slate-900 no-underline hover:text-brand-700">
                     {{ $distribuidor->razon_social }}
                 </a>
 
-                <span style="font-size:.82rem; color:#6b7280;">
-                    {{ $distribuidor->productos_count }}
+                <p class="m-0 text-sm text-slate-600">
+                    <span class="font-semibold text-slate-800">{{ $distribuidor->productos_count }}</span>
                     producto(s) activo(s) en catálogo
-                </span>
+                </p>
 
-                @if ($distribuidor->is_premium)
-                    <span>
-                        <span style="background:#fef3c7; color:#92400e; border:1px solid #fde68a;
-                                     border-radius:999px; padding:.1rem .55rem; font-size:.72rem;">
-                            Distribuidor Premium
-                        </span>
-                    </span>
-                @endif
-
-                <a class="btn" style="margin-top:.5rem;" href="{{ route('suppliers.show', $distribuidor->id) }}">
+                <a class="btn ghost mt-auto w-full" href="{{ route('suppliers.show', $distribuidor->id) }}">
                     Ver catálogo
                 </a>
             </article>
         @empty
-            <div class="card">
-                <h3 style="margin-top:0;">No hay distribuidores que coincidan</h3>
-                <p style="color:#6b7280; margin:0;">
+            <div class="card col-span-full">
+                <h2 class="mt-0 text-lg font-semibold text-slate-900">No hay distribuidores que coincidan</h2>
+                <p class="mb-0 text-sm leading-6 text-slate-600">
                     @if ($busqueda !== '')
                         Ningún distribuidor coincide con «{{ $busqueda }}».
                         <a href="{{ route('suppliers.index') }}">Ver todos</a>.
@@ -71,6 +80,6 @@
     </div>
 
     @if ($distribuidores->hasPages())
-        <div style="margin-top:2rem;">{{ $distribuidores->links() }}</div>
+        <div class="mt-8">{{ $distribuidores->links() }}</div>
     @endif
 @endsection

@@ -96,8 +96,11 @@ class AuthController extends Controller
         );
 
         if (! $autenticado) {
+            // La aplicación no tiene archivos de traducción y su locale es `en`:
+            // __('auth.failed') se imprimía literalmente en el formulario. El
+            // mensaje se declara en español, igual que el resto de la interfaz.
             return back()->withErrors([
-                'email' => __('auth.failed'),
+                'email' => 'El correo o la contraseña no coinciden con una cuenta registrada.',
             ])->onlyInput('email');
         }
 

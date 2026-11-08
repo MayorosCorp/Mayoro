@@ -51,8 +51,11 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_catalogo_muestra_el_boton_de_publicar_al_distribuidor
     public function test_el_catalogo_muestra_el_boton_de_publicar_al_distribuidor(): void
     {
+        // Given: un distribuidor con sesión iniciada
         $this->actingAs($this->distribuidor)
+            // When: consulta el catálogo público
             ->get(route('products.index'))
+            // Then: la página responde y muestra la URL y el texto del botón de publicar
             ->assertOk()
             ->assertSee(route('products.create'), escape: false)
             ->assertSee('Publicar Nuevo Producto', escape: false);
@@ -65,7 +68,10 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_visitante_anonimo_no_ve_el_boton_de_publicar
     public function test_el_visitante_anonimo_no_ve_el_boton_de_publicar(): void
     {
+        // Given: un visitante anónimo sin sesión iniciada
+        // When: consulta el catálogo público
         $this->get(route('products.index'))
+            // Then: la página responde y no muestra el botón de publicar
             ->assertOk()
             ->assertDontSee('Publicar Nuevo Producto', escape: false);
     }
@@ -77,8 +83,11 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_rol_bodega_no_ve_el_boton_de_publicar
     public function test_el_rol_bodega_no_ve_el_boton_de_publicar(): void
     {
+        // Given: un usuario con rol bodega y sesión iniciada
         $this->actingAs($this->bodega)
+            // When: consulta el catálogo público
             ->get(route('products.index'))
+            // Then: la página responde y no muestra el botón de publicar
             ->assertOk()
             ->assertDontSee('Publicar Nuevo Producto', escape: false);
     }
@@ -91,8 +100,11 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_distribuidor_acllega_al_formulario_de_publicacion
     public function test_el_distribuidor_acllega_al_formulario_de_publicacion(): void
     {
+        // Given: un distribuidor con sesión iniciada
         $this->actingAs($this->distribuidor)
+            // When: abre la URL del formulario de publicación
             ->get(route('products.create'))
+            // Then: el formulario responde con todos los campos del mapeo, incluida la imagen
             ->assertOk()
             ->assertSee('multipart/form-data', escape: false)
             ->assertSee('name="nombre"', escape: false)
@@ -114,8 +126,11 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_rol_bodega_recibe_403_al_forzar_la_url_de_publicacion
     public function test_el_rol_bodega_recibe_403_al_forzar_la_url_de_publicacion(): void
     {
+        // Given: un usuario con rol bodega y sesión iniciada
         $this->actingAs($this->bodega)
+            // When: fuerza la URL del formulario de publicación
             ->get(route('products.create'))
+            // Then: recibe 403 Forbidden en lugar de un formulario inútil
             ->assertForbidden();
     }
 
@@ -126,6 +141,8 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_distribuidor_encuentra_y_edita_su_producto_publicado
     public function test_el_distribuidor_encuentra_y_edita_su_producto_publicado(): void
     {
+        // Given: un distribuidor con sesión iniciada
+        // When: da de alta un producto en el catálogo
         $this->actingAs($this->distribuidor)->post(route('products.store'), [
             'nombre' => 'Atun Conservas 170g x 24',
             'categoria' => 'Enlatados',
@@ -138,15 +155,20 @@ class ProductPublishingNavigationTest extends TestCase
 
         $producto = Product::sole();
 
+        // Then: el producto queda registrado a nombre del distribuidor
         $this->assertSame($this->distribuidor->id, $producto->distribuidor_id);
 
+        // When: abre la ficha de su producto recién publicado
         $this->actingAs($this->distribuidor)
             ->get(route('products.show', $producto->id))
+            // Then: la ficha responde y muestra el nombre publicado
             ->assertOk()
             ->assertSee('Atun Conservas 170g x 24', escape: false);
 
+        // When: abre el formulario de edición del mismo producto
         $this->actingAs($this->distribuidor)
             ->get(route('products.edit', $producto->id))
+            // Then: el formulario responde con el mismo nombre
             ->assertOk()
             ->assertSee('Atun Conservas 170g x 24', escape: false);
     }
@@ -159,6 +181,7 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_un_distribuidor_no_puede_editar_el_producto_de_otro
     public function test_un_distribuidor_no_puede_editar_el_producto_de_otro(): void
     {
+        // Given: un producto ajeno, registrado a nombre de otro usuario
         $productoAjeno = Product::create([
             'distribuidor_id' => $this->bodega->id,
             'nombre' => 'Producto de tercero',
@@ -172,8 +195,10 @@ class ProductPublishingNavigationTest extends TestCase
             'is_active' => true,
         ]);
 
+        // When: un distribuidor distinto abre su URL de edición
         $this->actingAs($this->distribuidor)
             ->get(route('products.edit', $productoAjeno->id))
+            // Then: recibe 403 Forbidden
             ->assertForbidden();
     }
 
@@ -187,13 +212,18 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_distribuidor_alcanza_la_publicacion_desde_el_menu_y_el_dashboard
     public function test_el_distribuidor_alcanza_la_publicacion_desde_el_menu_y_el_dashboard(): void
     {
+        // Given: un distribuidor con sesión iniciada
         $this->actingAs($this->distribuidor)
+            // When: abre el dashboard
             ->get(route('dashboard.index'))
+            // Then: ve la acción de publicar
             ->assertOk()
             ->assertSee('Publicar Nuevo Producto', escape: false);
 
+        // When: abre una pantalla que no tiene su propio botón de publicación
         $this->actingAs($this->distribuidor)
             ->get(route('quotes.index'))
+            // Then: el enlace al formulario de publicación sigue presente
             ->assertOk()
             ->assertSee(route('products.create'), escape: false);
     }
@@ -206,8 +236,11 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_rol_bodega_no_encuentra_la_accion_de_publicar
     public function test_el_rol_bodega_no_encuentra_la_accion_de_publicar(): void
     {
+        // Given: un usuario con rol bodega y sesión iniciada
         $this->actingAs($this->bodega)
+            // When: abre el dashboard
             ->get(route('dashboard.index'))
+            // Then: el dashboard responde y no muestra la acción de publicar
             ->assertOk()
             ->assertDontSee('Publicar Nuevo Producto', escape: false);
     }
@@ -220,8 +253,11 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_rol_bodega_recibe_explicacion_del_bloqueo_de_publicacion
     public function test_el_rol_bodega_recibe_explicacion_del_bloqueo_de_publicacion(): void
     {
+        // Given: un usuario con rol bodega y sesión iniciada
         $this->actingAs($this->bodega)
+            // When: abre el dashboard
             ->get(route('dashboard.index'))
+            // Then: lee el motivo del bloqueo junto a su rol actual
             ->assertOk()
             ->assertSee('exclusiva del perfil', escape: false)
             ->assertSee('Distribuidor Mayorista', escape: false)
@@ -237,8 +273,11 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_distribuidor_no_recibe_el_aviso_de_bloqueo
     public function test_el_distribuidor_no_recibe_el_aviso_de_bloqueo(): void
     {
+        // Given: un distribuidor con sesión iniciada
         $this->actingAs($this->distribuidor)
+            // When: abre el dashboard
             ->get(route('dashboard.index'))
+            // Then: no recibe el aviso de bloqueo reservado al bodeguero
             ->assertOk()
             ->assertDontSee('exclusiva del perfil', escape: false);
     }
@@ -251,6 +290,8 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_dashboard_refleja_el_catalogo_real_del_distribuidor
     public function test_el_dashboard_refleja_el_catalogo_real_del_distribuidor(): void
     {
+        // Given: un distribuidor con sesión iniciada
+        // When: da de alta un producto en el catálogo
         $this->actingAs($this->distribuidor)->post(route('products.store'), [
             'nombre' => 'Leche Evaporada 400ml x 24',
             'categoria' => 'Lácteos',
@@ -261,12 +302,15 @@ class ProductPublishingNavigationTest extends TestCase
             'stock_disponible' => 30,
         ]);
 
+        // When: abre su dashboard
         $this->actingAs($this->distribuidor)
             ->get(route('dashboard.index'))
+            // Then: el contador de productos publicados refleja el catálogo real
             ->assertOk()
             ->assertSee('Productos publicados', escape: false)
             ->assertViewHas('metricas.productos', 1);
 
+        // Then: el producto quedó persistido a nombre del distribuidor
         $this->assertDatabaseHas('productos_mayoristas', [
             'nombre' => 'Leche Evaporada 400ml x 24',
             'distribuidor_id' => $this->distribuidor->id,
@@ -281,6 +325,7 @@ class ProductPublishingNavigationTest extends TestCase
     // php artisan test --filter=test_el_bodeguero_ve_el_total_del_catalogo_en_el_dashboard
     public function test_el_bodeguero_ve_el_total_del_catalogo_en_el_dashboard(): void
     {
+        // Given: un producto publicado en el catálogo por el distribuidor
         Product::create([
             'distribuidor_id' => $this->distribuidor->id,
             'nombre' => 'Producto visible para el bodeguero',
@@ -294,8 +339,10 @@ class ProductPublishingNavigationTest extends TestCase
             'is_active' => true,
         ]);
 
+        // When: un bodeguero abre su dashboard
         $this->actingAs($this->bodega)
             ->get(route('dashboard.index'))
+            // Then: ve el total del catálogo, no un cero
             ->assertOk()
             ->assertSee('Productos en catálogo', escape: false)
             ->assertViewHas('metricas.productos', 1);

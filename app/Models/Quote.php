@@ -18,6 +18,8 @@ class Quote extends Model
         'distribuidor_id',
         'cantidad_solicitada',
         'precio_unitario',
+        'precio_bulto',
+        'unidades_por_bulto',
         'subtotal',
         'igv',
         'total',
@@ -31,6 +33,8 @@ class Quote extends Model
         return [
             'cantidad_solicitada' => 'integer',
             'precio_unitario' => 'decimal:2',
+            'precio_bulto' => 'decimal:2',
+            'unidades_por_bulto' => 'integer',
             'subtotal' => 'decimal:2',
             'igv' => 'decimal:2',
             'total' => 'decimal:2',

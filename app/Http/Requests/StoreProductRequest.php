@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class StoreProductRequest extends FormRequest
 {
@@ -40,6 +41,30 @@ class StoreProductRequest extends FormRequest
             'stock_disponible' => ['required', 'integer', 'min:0', 'max:1000000'],
             'imagen' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
         ];
+    }
+
+    /**
+     * RN-05: un producto solo puede venderse por bultos cuando el stock cubre
+     * el pedido mínimo. Se admite 0 (agotado deliberado) o una cifra >= MOQ;
+     * un valor intermedio promete una compra que el propio catálogo bloquea.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            if ($validator->errors()->hasAny(['stock_disponible', 'moq_cantidad_minima'])) {
+                return;
+            }
+
+            $stock = (int) $this->input('stock_disponible');
+            $moq = (int) $this->input('moq_cantidad_minima');
+
+            if ($stock > 0 && $stock < $moq) {
+                $validator->errors()->add(
+                    'stock_disponible',
+                    "El stock debe ser 0 o al menos el pedido minimo de {$moq} bultos"
+                );
+            }
+        });
     }
 
     /**
