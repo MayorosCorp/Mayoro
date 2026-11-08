@@ -23,20 +23,20 @@ class QuoteWhatsAppFlowTest extends TestCase
         parent::setUp();
 
         $this->distribuidor = User::create([
-            'ruc_empresa' => '20601234567',
+            'ruc_empresa' => '20601234565',
             'razon_social' => 'Distribuidora Central S.A.C.',
             'email_contacto' => 'ventas@central.pe',
             'telefono_whatsapp' => '+51 987 654 321',
-            'rol' => 'distribuidor',
+            'rol' => 'empresario',
             'password' => bcrypt('password123'),
         ]);
 
         $this->bodega = User::create([
-            'ruc_empresa' => '10456789012',
+            'ruc_empresa' => '10456789019',
             'razon_social' => 'Bodega Don Pepe',
             'email_contacto' => 'compras@donpepe.pe',
             'telefono_whatsapp' => '+51 999 888 777',
-            'rol' => 'bodega',
+            'rol' => 'persona_natural',
             'password' => bcrypt('password123'),
         ]);
 
@@ -59,10 +59,10 @@ class QuoteWhatsAppFlowTest extends TestCase
      * oficial de WhatsApp con el detalle del pedido.
      */
 
-    // php artisan test --filter=test_bodeguero_registra_cotizacion_y_genera_enlace_de_whatsapp_codificado
-    public function test_bodeguero_registra_cotizacion_y_genera_enlace_de_whatsapp_codificado(): void
+    // php artisan test --filter=test_persona_natural_registra_cotizacion_y_genera_enlace_de_whatsapp_codificado
+    public function test_persona_natural_registra_cotizacion_y_genera_enlace_de_whatsapp_codificado(): void
     {
-        // Given: un bodeguero autenticado y un producto con MOQ de 5 bultos y precio unitario de 10.00
+        // Given: una Persona natural autenticada y un producto con MOQ de 5 bultos y precio unitario de 10.00
         // When: registra una cotización de 10 bultos desde el controlador de cotizaciones
         $response = $this->actingAs($this->bodega)->post(route('quotes.store'), [
             'producto_id' => $this->producto->id,
@@ -179,15 +179,15 @@ class QuoteWhatsAppFlowTest extends TestCase
     }
 
     /**
-     * HU-04: Seguridad RBAC - Un distribuidor no puede generar cotizaciones
-     * porque el flujo de compra es exclusivo del rol bodega (HTTP 403).
+     * RN-02: el Empresario administra su catalogo y no genera solicitudes con
+     * su propio rol. El flujo de compra es de la Persona natural o el visitante.
      */
 
-    // php artisan test --filter=test_bloquea_cotizacion_a_usuario_con_rol_distribuidor_con_http_403_rbac
-    public function test_bloquea_cotizacion_a_usuario_con_rol_distribuidor_con_http_403_rbac(): void
+    // php artisan test --filter=test_bloquea_cotizacion_a_empresario_con_http_403_rbac
+    public function test_bloquea_cotizacion_a_empresario_con_http_403_rbac(): void
     {
-        // Given: un usuario autenticado con rol distribuidor
-        // When: intenta registrar una cotización en lugar del rol bodega
+        // Given: un usuario autenticado con rol Empresario
+        // When: intenta registrar una cotizacion como si fuera comprador
         $response = $this->actingAs($this->distribuidor)->post(route('quotes.store'), [
             'producto_id' => $this->producto->id,
             'cantidad_solicitada' => 10,
@@ -199,22 +199,56 @@ class QuoteWhatsAppFlowTest extends TestCase
     }
 
     /**
-     * HU-04: Seguridad Anónima - El visitante no autenticado es redirigido al login.
+     * RN-01: el visitante sin cuenta tambien cotiza. Su solicitud no se persiste
+     * porque no hay identidad a la que atribuir un historial.
      */
 
-    // php artisan test --filter=test_bloquea_cotizacion_a_visitante_no_autenticado
-    public function test_bloquea_cotizacion_a_visitante_no_autenticado(): void
+    // php artisan test --filter=test_visitante_genera_cotizacion_efimera_sin_persistirla
+    public function test_visitante_genera_cotizacion_efimera_sin_persistirla(): void
     {
-        // Given: un visitante sin autenticar en la aplicación
-        // When: intenta registrar una cotización
+        // Given: un visitante sin autenticar en la aplicacion
+        // When: registra una cotizacion de 10 bultos
         $response = $this->post(route('quotes.store'), [
             'producto_id' => $this->producto->id,
             'cantidad_solicitada' => 10,
         ]);
 
-        // Then: es redirigido al login y no se crea ninguna cotización
-        $response->assertRedirect(route('login'));
+        // Then: se le muestra un resumen efimero y no se escribe en la base
+        $response->assertRedirect(route('quotes.efimera'));
         $this->assertDatabaseCount('cotizaciones_b2b', 0);
+        $this->assertIsArray(session('cotizacion_efimera'));
+    }
+
+    // php artisan test --filter=test_el_resumen_efimero_muestra_producto_desglose_y_enlace_de_whatsapp
+    public function test_el_resumen_efimero_muestra_producto_desglose_y_enlace_de_whatsapp(): void
+    {
+        // Given: un visitante que acaba de generar su cotizacion
+        $this->post(route('quotes.store'), [
+            'producto_id' => $this->producto->id,
+            'cantidad_solicitada' => 10,
+        ]);
+
+        // When: abre el resumen efimero
+        $response = $this->get(route('quotes.efimera'));
+
+        // Then: ve el producto, el desglose, el enlace y el aviso de que no se guardo
+        $response->assertOk();
+        $response->assertSee('Aceite Primor 1L x 12');
+        $response->assertSee('S/ 1,416.00');
+        $response->assertSee('https://wa.me/51987654321?text=', escape: false);
+        $response->assertSee('Enlace efímero');
+        $response->assertSee('no se guardó en la base de datos');
+    }
+
+    // php artisan test --filter=test_el_resumen_efimero_sin_datos_redirige_al_formulario
+    public function test_el_resumen_efimero_sin_datos_redirige_al_formulario(): void
+    {
+        // Given: un visitante que abre el resumen sin haber cotizado
+        // When: solicita la vista efimera
+        // Then: se le devuelve al formulario con un aviso
+        $this->get(route('quotes.efimera'))
+            ->assertRedirect(route('quotes.create'))
+            ->assertSessionHas('error');
     }
 
     /**
@@ -239,7 +273,7 @@ class QuoteWhatsAppFlowTest extends TestCase
             'razon_social' => 'Bodega Intrusa E.I.R.L.',
             'email_contacto' => 'intrusa@ajena.pe',
             'telefono_whatsapp' => '+51 977 666 555',
-            'rol' => 'bodega',
+            'rol' => 'persona_natural',
             'password' => bcrypt('password123'),
         ]);
 

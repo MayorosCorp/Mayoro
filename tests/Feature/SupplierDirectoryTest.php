@@ -17,7 +17,7 @@ class SupplierDirectoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->distribuidor = User::factory()->distribuidor()->create([
+        $this->distribuidor = User::factory()->empresario()->create([
             'razon_social' => 'Distribuidora Andina S.A.C.',
             'ruc_empresa' => '20123456789',
         ]);
@@ -49,7 +49,7 @@ class SupplierDirectoryTest extends TestCase
     public function test_el_directorio_excluye_los_comercios_con_rol_bodega(): void
     {
         // Given: un comercio con rol bodega que no debe figurar en el directorio
-        User::factory()->bodega()->create(['razon_social' => 'Bodega No Listada E.I.R.L.']);
+        User::factory()->personaNatural()->create(['razon_social' => 'Bodega No Listada E.I.R.L.']);
 
         // When: se visita el directorio de proveedores
         $response = $this->get(route('suppliers.index'));
@@ -67,7 +67,7 @@ class SupplierDirectoryTest extends TestCase
     public function test_el_buscador_filtra_por_razon_social_y_ruc(): void
     {
         // Given: un segundo distribuidor con razón social y RUC distintos al creado en setUp
-        User::factory()->distribuidor()->create([
+        User::factory()->empresario()->create([
             'razon_social' => 'Comercial del Norte E.I.R.L.',
             'ruc_empresa' => '20765432109',
         ]);
@@ -119,7 +119,7 @@ class SupplierDirectoryTest extends TestCase
     public function test_un_id_de_bodega_no_resuelve_como_ficha_de_distribuidor(): void
     {
         // Given: un comercio con rol bodega
-        $bodega = User::factory()->bodega()->create();
+        $bodega = User::factory()->personaNatural()->create();
 
         // When: se solicita su ficha usando su id como si fuera distribuidor
         // Then: la solicitud responde con HTTP 404
@@ -145,6 +145,6 @@ class SupplierDirectoryTest extends TestCase
             ->assertOk()
             ->assertSee('Distribuidora Andina S.A.C.')
             ->assertSee('Producto Visible')
-            ->assertSee('Ingresar para cotizar');
+            ->assertSee('Cotizar pedido');
     }
 }

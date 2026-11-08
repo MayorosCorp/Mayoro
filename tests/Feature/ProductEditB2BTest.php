@@ -31,7 +31,7 @@ class ProductEditB2BTest extends TestCase
     public function test_distribuidor_puede_editar_su_propio_producto_con_fakes_y_spies(): void
     {
         // Given: un distribuidor es propietario de un producto con imagen existente.
-        $distribuidor = User::factory()->distribuidor()->create();
+        $distribuidor = User::factory()->empresario()->create();
         $imagenAnterior = 'productos/imagen-anterior.png';
         Storage::disk('public')->put($imagenAnterior, 'imagen anterior');
         $producto = Product::factory()->create([
@@ -79,8 +79,8 @@ class ProductEditB2BTest extends TestCase
     public function test_bloquea_edicion_de_producto_ajeno_con_http_403_rbac(): void
     {
         // Given: un distribuidor autenticado intenta modificar el producto de otro.
-        $distribuidorA = User::factory()->distribuidor()->create();
-        $distribuidorB = User::factory()->distribuidor()->create();
+        $distribuidorA = User::factory()->empresario()->create();
+        $distribuidorB = User::factory()->empresario()->create();
         $productoAjeno = Product::factory()->create([
             'distribuidor_id' => $distribuidorB->id,
         ]);
@@ -111,8 +111,8 @@ class ProductEditB2BTest extends TestCase
     public function test_solo_muestra_la_accion_de_edicion_en_productos_propios(): void
     {
         // Given: un distribuidor tiene un producto propio y puede ver uno ajeno.
-        $distribuidor = User::factory()->distribuidor()->create();
-        $otroDistribuidor = User::factory()->distribuidor()->create();
+        $distribuidor = User::factory()->empresario()->create();
+        $otroDistribuidor = User::factory()->empresario()->create();
         $productoPropio = Product::factory()->create([
             'distribuidor_id' => $distribuidor->id,
         ]);
@@ -144,7 +144,7 @@ class ProductEditB2BTest extends TestCase
     public function test_rechaza_actualizacion_con_precio_o_moq_invalidos(): void
     {
         // Given: un distribuidor propietario y un producto que no debe modificarse.
-        $distribuidor = User::factory()->distribuidor()->create();
+        $distribuidor = User::factory()->empresario()->create();
         $producto = Product::factory()->create([
             'distribuidor_id' => $distribuidor->id,
         ]);

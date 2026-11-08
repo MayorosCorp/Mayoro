@@ -19,12 +19,12 @@ class ProductPublishingB2BTest extends TestCase
     {
         // HU-02 — Given: un distribuidor mayorista registrado con datos válidos
         $distribuidor = User::create([
-            'ruc_empresa' => '20601234567',
+            'ruc_empresa' => '20601234565',
             'razon_social' => 'Distribuidora Central S.A.C.',
             'email_contacto' => 'distribuidor@central.pe',
             'telefono_whatsapp' => '+51987654321',
             'direccion' => 'Av. Los Productores 456',
-            'rol' => 'distribuidor',
+            'rol' => 'empresario',
             'password' => bcrypt('password123'),
         ]);
 
@@ -69,11 +69,11 @@ class ProductPublishingB2BTest extends TestCase
     {
         // HU-02 — Given: un distribuidor mayorista registrado y un payload con precio y MOQ en cero
         $distribuidor = User::create([
-            'ruc_empresa' => '20601234567',
+            'ruc_empresa' => '20601234565',
             'razon_social' => 'Distribuidora Central S.A.C.',
             'email_contacto' => 'distribuidor@central.pe',
             'telefono_whatsapp' => '+51987654321',
-            'rol' => 'distribuidor',
+            'rol' => 'empresario',
             'password' => bcrypt('password123'),
         ]);
 
@@ -109,11 +109,11 @@ class ProductPublishingB2BTest extends TestCase
     {
         // HU-02 — Given: un usuario autenticado con rol "bodega" (no distribuidor)
         $bodega = User::create([
-            'ruc_empresa' => '10456789012',
+            'ruc_empresa' => '10456789019',
             'razon_social' => 'Bodega Don Pepe',
             'email_contacto' => 'donpepe@bodega.pe',
             'telefono_whatsapp' => '+51999888777',
-            'rol' => 'bodega',
+            'rol' => 'persona_natural',
             'password' => bcrypt('password123'),
         ]);
 
@@ -170,11 +170,11 @@ class ProductPublishingB2BTest extends TestCase
     {
         // HU-02 — Given: un distribuidor mayorista registrado y un payload con etiquetas HTML maliciosas
         $distribuidor = User::create([
-            'ruc_empresa' => '20601234567',
+            'ruc_empresa' => '20601234565',
             'razon_social' => 'Distribuidora Central S.A.C.',
             'email_contacto' => 'distribuidor@central.pe',
             'telefono_whatsapp' => '+51987654321',
-            'rol' => 'distribuidor',
+            'rol' => 'empresario',
             'password' => bcrypt('password123'),
         ]);
 
@@ -215,11 +215,11 @@ class ProductPublishingB2BTest extends TestCase
     {
         // HU-02 — Given: un distribuidor mayorista registrado y un payload con precio de tres decimales
         $distribuidor = User::create([
-            'ruc_empresa' => '20601234567',
+            'ruc_empresa' => '20601234565',
             'razon_social' => 'Distribuidora Central S.A.C.',
             'email_contacto' => 'distribuidor@central.pe',
             'telefono_whatsapp' => '+51987654321',
-            'rol' => 'distribuidor',
+            'rol' => 'empresario',
             'password' => bcrypt('password123'),
         ]);
 

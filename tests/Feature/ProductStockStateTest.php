@@ -32,11 +32,11 @@ class ProductStockStateTest extends TestCase
         parent::setUp();
 
         $this->distribuidor = User::create([
-            'ruc_empresa' => '20601234567',
+            'ruc_empresa' => '20601234565',
             'razon_social' => 'Distribuidora Andina S.A.C.',
             'email_contacto' => 'ventas@andina.pe',
             'telefono_whatsapp' => '+51 987654321',
-            'rol' => 'distribuidor',
+            'rol' => 'empresario',
             'password' => bcrypt('password'),
         ]);
     }
@@ -152,7 +152,7 @@ class ProductStockStateTest extends TestCase
             'razon_social' => 'Bodega El Comercio E.I.R.L.',
             'email_contacto' => 'compras@comercio.pe',
             'telefono_whatsapp' => '+51 912345678',
-            'rol' => 'bodega',
+            'rol' => 'persona_natural',
             'password' => bcrypt('password'),
         ]);
 
@@ -301,11 +301,11 @@ class ProductStockStateTest extends TestCase
         $producto = $this->producto(['is_active' => false]);
 
         $otro = User::create([
-            'ruc_empresa' => '20609999999',
+            'ruc_empresa' => '20609999994',
             'razon_social' => 'Otra Distribuidora S.A.C.',
             'email_contacto' => 'ventas@otra.pe',
             'telefono_whatsapp' => '+51 911111111',
-            'rol' => 'distribuidor',
+            'rol' => 'empresario',
             'password' => bcrypt('password'),
         ]);
 

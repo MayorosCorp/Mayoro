@@ -20,27 +20,30 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $distribuidor = User::query()->updateOrCreate(
-            ['ruc_empresa' => '20123456789'],
+            ['email_contacto' => 'ventas@distribuidora-andina.pe'],
             [
+                'ruc_empresa' => '20123456786',
                 'razon_social' => 'Distribuidora Andina S.A.C.',
-                'email_contacto' => 'ventas@distribuidora-andina.pe',
+                'rubro' => 'Abarrotes y bebidas',
                 'telefono_whatsapp' => '+51987654321',
                 'direccion' => 'Av. Los Álamos 1450, Lima',
                 'password' => Hash::make('password'),
-                'rol' => 'distribuidor',
+                'rol' => User::ROL_EMPRESARIO,
                 'is_premium' => true,
             ]
         );
 
+        // RN-01: la cuenta de compra nace como Persona natural, sin RUC.
         $bodega = User::query()->updateOrCreate(
-            ['ruc_empresa' => '20987654321'],
+            ['email_contacto' => 'compras@bodegaelcomercio.pe'],
             [
-                'razon_social' => 'Bodega El Comercio E.I.R.L.',
-                'email_contacto' => 'compras@bodegaelcomercio.pe',
+                'ruc_empresa' => null,
+                'razon_social' => 'Bodega El Comercio',
+                'rubro' => null,
                 'telefono_whatsapp' => '+51911223344',
                 'direccion' => 'Jr. Garcilaso 210, Cusco',
                 'password' => Hash::make('password'),
-                'rol' => 'bodega',
+                'rol' => User::ROL_PERSONA_NATURAL,
                 'is_premium' => false,
             ]
         );
@@ -151,9 +154,9 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        $this->command?->info('Comercios B2B: 2 (1 distribuidor, 1 bodega).');
+        $this->command?->info('Cuentas demo: 2 (1 Empresario, 1 Persona natural).');
         $this->command?->info('Productos mayoristas: '.count($productos));
-        $this->command?->info('Acceso distribuidor: ventas@distribuidora-andina.pe / password');
-        $this->command?->info('Acceso bodega: compras@bodegaelcomercio.pe / password');
+        $this->command?->info('Acceso Empresario: ventas@distribuidora-andina.pe / password');
+        $this->command?->info('Acceso Persona natural: compras@bodegaelcomercio.pe / password');
     }
 }
