@@ -10,7 +10,7 @@
         </h1>
         <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
             Comercios verificados que publican productos con precio por bulto y pedido mínimo
-            en el catálogo de Mayoro.
+            en el catálogo de Mayoro. Entra a su micrositio para conocer el negocio y su catálogo propio.
         </p>
     </section>
 
@@ -50,7 +50,7 @@
                     @endif
                 </div>
 
-                <a href="{{ route('suppliers.show', $distribuidor->id) }}"
+                <a href="{{ $distribuidor->micrositio_url ?? route('suppliers.show', $distribuidor->id) }}"
                    class="break-words text-lg font-semibold leading-snug text-slate-900 no-underline hover:text-brand-700">
                     {{ $distribuidor->razon_social }}
                 </a>
@@ -60,9 +60,18 @@
                     producto(s) activo(s) en catálogo
                 </p>
 
-                <a class="btn ghost mt-auto w-full" href="{{ route('suppliers.show', $distribuidor->id) }}">
-                    Ver catálogo
-                </a>
+                <div class="mt-auto grid grid-cols-1 gap-2">
+                    @if ($distribuidor->micrositio_url)
+                        <a class="btn" href="{{ $distribuidor->micrositio_url }}"
+                           data-testid="distribuidor-micrositio">
+                            Ver micrositio
+                        </a>
+                    @endif
+
+                    <a class="btn ghost w-full" href="{{ route('suppliers.show', $distribuidor->id) }}">
+                        Ver catálogo
+                    </a>
+                </div>
             </article>
         @empty
             <div class="card col-span-full">

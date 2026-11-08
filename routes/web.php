@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\MicrositeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -47,6 +48,13 @@ Route::middleware('auth')->group(function () {
     Route::prefix('perfil')->name('profile.')->group(function () {
         Route::get('/empresario', [ProfileController::class, 'showEmpresarioForm'])->name('empresario');
         Route::post('/empresario', [ProfileController::class, 'convertirEnEmpresario'])->name('empresario.convertir');
+    });
+
+    // RN-03: la vitrina es privada de su dueno. La ruta no acepta id, por lo
+    // que el servidor siempre edita la cuenta autenticada.
+    Route::middleware('role:empresario')->group(function () {
+        Route::get('/mi-empresa', [MicrositeController::class, 'edit'])->name('microsite.edit');
+        Route::put('/mi-empresa', [MicrositeController::class, 'update'])->name('microsite.update');
     });
 
     Route::prefix('orders')->name('orders.')->group(function () {
@@ -96,6 +104,17 @@ Route::prefix('proveedores')->name('suppliers.')->group(function () {
     Route::get('/', [SupplierController::class, 'index'])->name('index');
     Route::get('/{supplier}', [SupplierController::class, 'show'])->name('show')->whereNumber('supplier');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Micrositio del Empresario (RN-03)
+|--------------------------------------------------------------------------
+| Vitrina publica y personalizable de cada Empresario validado. El slug es la
+| unica llave de acceso y se restringe a minusculas, numeros y guiones.
+*/
+Route::get('/empresas/{slug}', [MicrositeController::class, 'show'])
+    ->name('microsite.show')
+    ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');
 
 /*
 |--------------------------------------------------------------------------

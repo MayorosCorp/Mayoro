@@ -32,7 +32,11 @@ class UserFactory extends Factory
         return [
             'ruc_empresa' => null,
             'razon_social' => $razonSocial,
+            'slug' => null,
             'rubro' => fake()->randomElement(['Abarrotes', 'Bebidas', 'Limpieza', 'Lácteos']),
+            'descripcion' => null,
+            'color_primario' => '#23497b',
+            'horario_atencion' => null,
             'email_contacto' => Str::slug($razonSocial, '.').'@'.fake()->domainName(),
             'telefono_whatsapp' => '+51'.fake()->numerify('9########'),
             'direccion' => fake()->address(),
@@ -51,6 +55,7 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'ruc_empresa' => self::rucValido(),
             'rol' => User::ROL_EMPRESARIO,
+            'slug' => Str::slug((string) $attributes['razon_social']).'-'.fake()->unique()->numerify('####'),
         ]);
     }
 

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="Mayoro conecta compradores y distribuidores mayoristas del Perú: catálogo con precio por bulto, MOQ y cotización directa por WhatsApp, sin RUC para explorar.">
+    <meta name="description" content="@yield('meta_description', 'Mayoro conecta compradores y distribuidores mayoristas del Perú: catálogo con precio por bulto, MOQ y cotización directa por WhatsApp, sin RUC para explorar.')">
     <title>@yield('title', 'Mayoro') &mdash; Mayoro</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -48,6 +48,8 @@
                        href="{{ route('quotes.index') }}">Cotizaciones</a>
 
                     @if (auth()->user()->esEmpresario())
+                        <a class="{{ $navBase }} {{ request()->routeIs('microsite.*') ? $navActive : '' }}"
+                           href="{{ route('microsite.edit') }}">Mi empresa</a>
                         <a class="ml-1 inline-flex whitespace-nowrap rounded-lg bg-accent-500 px-3 py-1.5 text-sm font-semibold text-brand-950 no-underline transition hover:bg-accent-400"
                            href="{{ route('products.create') }}">+ Publicar Producto</a>
                     @else

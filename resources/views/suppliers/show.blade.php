@@ -20,9 +20,18 @@
                 </p>
             </div>
 
-            @if ($supplier->is_premium)
-                <span class="badge badge-accent shrink-0">Distribuidor Premium</span>
-            @endif
+            <div class="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+                @if ($supplier->is_premium)
+                    <span class="badge badge-accent shrink-0">Distribuidor Premium</span>
+                @endif
+
+                @if ($supplier->micrositio_url)
+                    <a class="btn" href="{{ $supplier->micrositio_url }}"
+                       data-testid="distribuidor-micrositio">
+                        Ver micrositio
+                    </a>
+                @endif
+            </div>
         </div>
     </section>
 
