@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProductUpdated;
 use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\Services\ProductImageStorage;
 use App\Services\QuotationService;
@@ -135,12 +137,15 @@ class ProductController extends Controller
             ? Product::with('distribuidor')->findOrFail($product)
             : $product;
 
-        $unitario = $productModel->precio_unitario_calculado;
+        // El desglose de la ficha es por bulto, la unidad de comercio de
+        // Mayoro. Calcularlo sobre el precio unitario derivado mostraba un IGV
+        // y un total doce veces menores en un bulto de doce unidades.
+        $precioBulto = (float) $productModel->precio_bulto;
 
         return view('products.show', [
             'product' => $productModel,
-            'igv' => round($unitario * QuotationService::IGV_RATE, 2),
-            'precioConIgv' => round($unitario * (1 + QuotationService::IGV_RATE), 2),
+            'igv' => round($precioBulto * QuotationService::IGV_RATE, 2),
+            'precioConIgv' => round($precioBulto * (1 + QuotationService::IGV_RATE), 2),
         ]);
     }
 
@@ -156,7 +161,7 @@ class ProductController extends Controller
         return view('products.edit', ['product' => $productModel->load('distribuidor')]);
     }
 
-    public function update(StoreProductRequest $request, string|int $product): RedirectResponse
+    public function update(UpdateProductRequest $request, string|int $product): RedirectResponse
     {
         $productModel = $this->buscarProductoPropio($request, $product);
         $validated = $request->validated();
@@ -183,6 +188,8 @@ class ProductController extends Controller
             'moq_cantidad_minima' => (int) $validated['moq_cantidad_minima'],
             'stock_disponible' => (int) $validated['stock_disponible'],
         ]);
+
+        ProductUpdated::dispatch($productModel);
 
         return redirect()->route('products.show', $productModel->id)
             ->with('success', 'Producto actualizado correctamente.');

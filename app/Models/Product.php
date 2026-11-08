@@ -60,11 +60,13 @@ class Product extends Model
     }
 
     /**
-     * Un producto solo es comprable si está activo y además tiene existencias (HU-03).
+     * Un producto solo es comprable si está activo y su stock alcanza el MOQ
+     * que el propio distribuidor exige (HU-03 + RN-05). Tener una existencia
+     * menor al mínimo no permite cerrar una cotización válida.
      */
     public function getEstaAgotadoAttribute(): bool
     {
-        return ! $this->is_active || (int) $this->stock_disponible <= 0;
+        return $this->estado_stock !== 'disponible';
     }
 
     /**
@@ -82,7 +84,17 @@ class Product extends Model
             return 'pausado';
         }
 
-        return (int) $this->stock_disponible <= 0 ? 'sin_stock' : 'disponible';
+        $stock = (int) $this->stock_disponible;
+
+        if ($stock <= 0) {
+            return 'sin_stock';
+        }
+
+        if ($stock < (int) $this->moq_cantidad_minima) {
+            return 'stock_insuficiente';
+        }
+
+        return 'disponible';
     }
 
     /**
@@ -93,6 +105,7 @@ class Product extends Model
         return match ($this->estado_stock) {
             'pausado' => 'Pausado por el distribuidor',
             'sin_stock' => 'Temporalmente sin stock',
+            'stock_insuficiente' => 'Stock insuficiente para el pedido mínimo',
             default => 'Disponible',
         };
     }
