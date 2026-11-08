@@ -10,11 +10,15 @@ use Illuminate\Validation\Validator;
 class StoreQuoteRequest extends FormRequest
 {
     /**
-     * Ficha CI-COD-09: solo el rol bodega puede solicitar cotizaciones.
+     * RN-01: cotizar no exige RUC ni cuenta. Un visitante (sin usuario) y una
+     * Persona Natural pueden solicitar; el Empresario administra su catalogo,
+     * no genera solicitudes con su propio rol.
      */
     public function authorize(): bool
     {
-        return $this->user()?->rol === 'bodega';
+        $user = $this->user();
+
+        return $user === null || $user->esPersonaNatural();
     }
 
     /**

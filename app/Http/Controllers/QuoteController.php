@@ -17,15 +17,15 @@ class QuoteController extends Controller
     ) {}
 
     /**
-     * Listado de cotizaciones segun el rol: la bodega ve las que solicito,
-     * el distribuidor ve las que recibio.
+     * Historial de cotizaciones: la Persona Natural ve las que genero y el
+     * Empresario las que recibio. Ambas caras son el mismo registro.
      */
     public function index(Request $request): View
     {
         $user = $request->user();
 
         $quotes = Quote::with(['producto', 'bodega', 'distribuidor'])
-            ->where($user->rol === 'distribuidor' ? 'distribuidor_id' : 'bodega_id', $user->id)
+            ->where($user->esEmpresario() ? 'distribuidor_id' : 'bodega_id', $user->id)
             ->latest()
             ->paginate(12);
 
@@ -57,6 +57,10 @@ class QuoteController extends Controller
 
     /**
      * Registra la cotizacion y genera el enlace codificado de WhatsApp (HU-04).
+     *
+     * RN-01: un visitante sin cuenta tambien cotiza. Su solicitud no se
+     * persiste: se guarda en sesion y se muestra como enlace efimero, porque no
+     * hay identidad verificada a la que atribuir un historial.
      */
     public function store(StoreQuoteRequest $request): RedirectResponse
     {
@@ -76,15 +80,33 @@ class QuoteController extends Controller
         $precioBulto = (float) $producto->precio_bulto;
         $totales = $this->quotation->calcularTotales($precioBulto, $cantidad);
         $telefono = (string) $producto->distribuidor?->telefono_whatsapp;
-        $mensaje = $this->quotation->resumirCotizacion($request->user(), $producto, $cantidad);
+        $solicitante = $request->user();
+        $mensaje = $this->quotation->resumirCotizacion($solicitante, $producto, $cantidad);
 
         $urlWhatsapp = $this->esTelefonoUtilizable($telefono)
             ? $this->quotation->generateWhatsAppLink($telefono, $mensaje)
             : null;
 
+        if ($solicitante === null) {
+            $request->session()->put('cotizacion_efimera', [
+                'producto_id' => $producto->id,
+                'cantidad_solicitada' => $cantidad,
+                'precio_bulto' => $precioBulto,
+                'unidades_por_bulto' => $producto->unidades_por_bulto,
+                'subtotal' => $totales['subtotal'],
+                'igv' => $totales['igv'],
+                'total' => $totales['total'],
+                'telefono_destino' => $telefono,
+                'url_whatsapp' => $urlWhatsapp,
+                'generada_en' => now()->toIso8601String(),
+            ]);
+
+            return redirect()->route('quotes.efimera');
+        }
+
         $quote = Quote::create([
             'producto_id' => $producto->id,
-            'bodega_id' => $request->user()->id,
+            'bodega_id' => $solicitante->id,
             'distribuidor_id' => $producto->distribuidor_id,
             'cantidad_solicitada' => $cantidad,
             // Snapshot del bulto: la cotizacion queda congelada con las
@@ -111,6 +133,36 @@ class QuoteController extends Controller
         return redirect()
             ->route('quotes.show', $quote)
             ->with('success', 'Cotizacion registrada. Envia el resumen al distribuidor por WhatsApp.');
+    }
+
+    /**
+     * Enlace efimero del visitante sin cuenta: vive en su sesion, no en la base
+     * de datos. Al no haber usuario no se puede prometer historial ni autoría.
+     */
+    public function efimera(Request $request): View|RedirectResponse
+    {
+        $datos = $request->session()->get('cotizacion_efimera');
+
+        if (! is_array($datos)) {
+            return redirect()
+                ->route('quotes.create')
+                ->with('error', 'Tu cotizacion efimera ya no esta disponible. Genera una nueva.');
+        }
+
+        $producto = Product::with('distribuidor')->find($datos['producto_id'] ?? null);
+
+        if ($producto === null) {
+            $request->session()->forget('cotizacion_efimera');
+
+            return redirect()
+                ->route('quotes.create')
+                ->with('error', 'El producto de esa cotizacion ya no esta disponible en el catalogo.');
+        }
+
+        return view('quotes.efimera', [
+            'cotizacion' => $datos,
+            'producto' => $producto,
+        ]);
     }
 
     public function show(Request $request, Quote $quote): View
