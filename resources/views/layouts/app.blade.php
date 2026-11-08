@@ -4,75 +4,102 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="Mayoro conecta bodegas y distribuidores mayoristas del Perú: catálogo con precio por bulto, MOQ y cotización directa por WhatsApp.">
     <title>@yield('title', 'Mayoro') &mdash; Mayoro</title>
-    <style>
-        :root { color-scheme: light; }
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: #f5f6f8; color: #1f2937; }
-        .topnav { background: #12305c; color: #fff; display: flex; gap: 1rem; padding: .8rem 1.5rem; align-items: center; flex-wrap: wrap; }
-        .topnav a { color: #fff; text-decoration: none; font-weight: 500; }
-        .topnav a:hover { text-decoration: underline; }
-        .topnav .brand { font-weight: 700; font-size: 1.15rem; margin-right: 1.5rem; }
-        .topnav .grow { flex: 1; }
-        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
-        .card { background: #fff; border: 1px solid #e5e7eb; border-radius: .5rem; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
-        .btn { display: inline-block; padding: .5rem .9rem; border-radius: .375rem; background: #2563eb; color: #fff !important; text-decoration: none; border: 0; cursor: pointer; font-size: .9rem; }
-        .btn:hover { background: #1d4ed8; }
-        .btn.ghost { background: transparent; color: #1f2937; border: 1px solid #d1d5db; }
-        .btn[disabled], .btn.disabled { background: #9ca3af; cursor: not-allowed; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th, td { text-align: left; padding: .6rem .75rem; border-bottom: 1px solid #e5e7eb; font-size: .9rem; }
-        th { background: #f9fafb; }
-        label { display: block; font-size: .85rem; font-weight: 600; margin: .9rem 0 .3rem; }
-        input, select, textarea { width: 100%; padding: .5rem .6rem; border: 1px solid #d1d5db; border-radius: .375rem; font-size: .95rem; }
-        .flash { padding: .75rem 1rem; border-radius: .375rem; margin-bottom: 1rem; }
-        .flash.success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-        .flash.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
-        .error-list li { color: #b91c1c; font-size: .85rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
-        .stat { background: #fff; border: 1px solid #e5e7eb; border-radius: .5rem; padding: 1.25rem; }
-        .stat .value { font-size: 1.6rem; font-weight: 700; }
-        .stat .label { color: #6b7280; font-size: .85rem; }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body>
-    <nav class="topnav">
-        <span class="brand">Mayoro</span>
-        @auth
-            <a href="{{ route('dashboard.index') }}">Dashboard</a>
-            <a href="{{ route('products.index') }}">Productos</a>
-            <a href="{{ route('suppliers.index') }}">Distribuidores</a>
-            <a href="{{ route('quotes.index') }}">Cotizaciones</a>
-            <a href="{{ route('orders.index') }}">Pedidos</a>
-            <a href="{{ route('inventory.index') }}">Inventario</a>
-            <a href="{{ route('reports.index') }}">Reportes</a>
-            @if (auth()->user()->rol === 'distribuidor')
-                <a class="btn" style="background:#f59e0b; color:#3b2500 !important; padding:.3rem .7rem;"
-                   href="{{ route('products.create') }}">+ Publicar Producto</a>
-            @endif
-            <span class="grow"></span>
-            <span style="font-size:.85rem; opacity:.85;">{{ auth()->user()->razon_social }}</span>
-            <form method="POST" action="{{ route('auth.logout') }}">
-                @csrf
-                <button class="btn ghost" type="submit">Cerrar sesión</button>
-            </form>
-        @endauth
-        @guest
-            <a href="{{ route('home') }}">Inicio</a>
-            <a href="{{ route('products.index') }}">Catálogo</a>
-            <a href="{{ route('suppliers.index') }}">Distribuidores</a>
-            <span class="grow"></span>
-            <a href="{{ route('auth.login') }}">Ingresar</a>
-            <a class="btn" style="background:#f59e0b; color:#3b2500 !important;" href="{{ route('auth.register') }}">Registrarse</a>
-        @endguest
-    </nav>
+<body class="flex min-h-screen flex-col">
+    <a href="#contenido"
+       class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-brand-900 focus:shadow-lg">
+        Saltar al contenido
+    </a>
 
-    <main class="container">
+    <header class="sticky top-0 z-40 border-b border-white/10 bg-brand-900 text-white shadow-md">
+        <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3 sm:px-8">
+            <a href="{{ route('home') }}"
+               class="flex items-center gap-2 text-lg font-semibold tracking-tight text-white no-underline">
+                <span class="grid h-8 w-8 place-items-center rounded-lg bg-accent-500 text-sm font-bold text-brand-950">M</span>
+                Mayoro
+                <span class="hidden rounded-full border border-white/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-brand-100 sm:inline">B2B</span>
+            </a>
+
+            @php
+                $navBase = 'whitespace-nowrap rounded-lg px-2.5 py-1.5 text-sm font-medium text-brand-100 transition hover:bg-white/10 hover:text-white';
+                $navActive = 'bg-white/10 text-white';
+            @endphp
+
+            {{--
+                La navegación se queda en su propia fila y con scroll horizontal
+                hasta 1280px: con siete enlaces más la acción de publicar, el
+                ancho mínimo del contenido superaba el viewport y empujaba la
+                página entera. Los módulos de Pedidos, Inventario y Reportes no
+                se anuncian como "pronto" aquí porque todavía no existen.
+            --}}
+            <nav class="order-3 flex w-full min-w-0 items-center gap-1 overflow-x-auto pb-1 xl:order-none xl:w-auto xl:flex-1 xl:pb-0"
+                 aria-label="Navegación principal">
+                @auth
+                    <a class="{{ $navBase }} {{ request()->routeIs('dashboard.*') ? $navActive : '' }}"
+                       href="{{ route('dashboard.index') }}">Dashboard</a>
+                    <a class="{{ $navBase }} {{ request()->routeIs('products.*') ? $navActive : '' }}"
+                       href="{{ route('products.index') }}">Productos</a>
+                    <a class="{{ $navBase }} {{ request()->routeIs('suppliers.*') ? $navActive : '' }}"
+                       href="{{ route('suppliers.index') }}">Distribuidores</a>
+                    <a class="{{ $navBase }} {{ request()->routeIs('quotes.*') ? $navActive : '' }}"
+                       href="{{ route('quotes.index') }}">Cotizaciones</a>
+
+                    @if (auth()->user()->rol === 'distribuidor')
+                        <a class="ml-1 inline-flex whitespace-nowrap rounded-lg bg-accent-500 px-3 py-1.5 text-sm font-semibold text-brand-950 no-underline transition hover:bg-accent-400"
+                           href="{{ route('products.create') }}">+ Publicar Producto</a>
+                    @endif
+                @else
+                    <a class="{{ $navBase }} {{ request()->routeIs('home') ? $navActive : '' }}"
+                       href="{{ route('home') }}">Inicio</a>
+                    <a class="{{ $navBase }} {{ request()->routeIs('products.*') ? $navActive : '' }}"
+                       href="{{ route('products.index') }}">Catálogo</a>
+                    <a class="{{ $navBase }} {{ request()->routeIs('suppliers.*') ? $navActive : '' }}"
+                       href="{{ route('suppliers.index') }}">Distribuidores</a>
+                @endauth
+            </nav>
+
+            <div class="ml-auto flex items-center gap-3">
+                @auth
+                    <span class="hidden text-right text-xs leading-tight text-brand-100 sm:block">
+                        <span class="block font-semibold text-white">{{ auth()->user()->razon_social }}</span>
+                        <span class="capitalize">{{ auth()->user()->rol }}</span>
+                    </span>
+                    <form method="POST" action="{{ route('auth.logout') }}">
+                        @csrf
+                        <button class="whitespace-nowrap rounded-lg border border-white/20 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/10"
+                                type="submit">Cerrar sesión</button>
+                    </form>
+                @else
+                    <a class="whitespace-nowrap rounded-lg px-2.5 py-1.5 text-sm font-medium text-brand-100 no-underline transition hover:bg-white/10 hover:text-white"
+                       href="{{ route('auth.login') }}">Ingresar</a>
+                    <a class="whitespace-nowrap rounded-lg bg-accent-500 px-3 py-1.5 text-sm font-semibold text-brand-950 no-underline transition hover:bg-accent-400"
+                       href="{{ route('auth.register') }}">Registrarse</a>
+                @endauth
+            </div>
+        </div>
+    </header>
+
+    <main id="contenido" class="mx-auto w-full max-w-6xl flex-1 px-5 py-8 sm:px-8">
         @if (session('status') || session('success'))
-            <div class="flash success">{{ session('status') ?? session('success') }}</div>
+            <div class="flash success" role="status">
+                <span aria-hidden="true">✓</span>
+                <span>{{ session('status') ?? session('success') }}</span>
+            </div>
         @endif
+
+        @if (session('error'))
+            <div class="flash error" role="alert">
+                <span aria-hidden="true">!</span>
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
+
         @if ($errors->any())
-            <div class="flash error">
+            <div class="flash error" role="alert">
+                <span aria-hidden="true">!</span>
                 <ul class="error-list">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -83,5 +110,16 @@
 
         @yield('content')
     </main>
+
+    <footer class="mt-8 border-t border-slate-200 bg-white">
+        <div class="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+            <p class="m-0">
+                <span class="font-semibold text-slate-700">Mayoro</span> conecta bodegas y distribuidores mayoristas.
+            </p>
+            <p class="m-0">
+                La cotización se cierra por WhatsApp. Mayoro no procesa pagos ni envíos.
+            </p>
+        </div>
+    </footer>
 </body>
 </html>
