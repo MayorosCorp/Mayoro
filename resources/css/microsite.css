@@ -1,0 +1,659 @@
+/*
+ * Micrositio del Empresario (RN-03).
+ *
+ * La vitrina tiene lenguaje propio dentro de Mayoro: membrete comercial con el
+ * color de la empresa, monograma cuando no hay logotipo, datos de contacto en
+ * una banda continua y tarjetas de catalogo donde el precio por bulto manda.
+ * Todo se apoya en --ms-brand y --ms-brand-ink, calculados en el servidor para
+ * conservar el contraste con cualquier color que elija el Empresario.
+ */
+.microsite {
+    --ms-brand: #12305c;
+    --ms-brand-ink: #ffffff;
+    --ms-ink: #172033;
+    --ms-muted: #5b6474;
+    --ms-line: #e2e5ea;
+    --ms-paper: #ffffff;
+    --ms-radius: 20px;
+}
+
+.microsite .ms-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: var(--ms-radius);
+    background: var(--ms-brand);
+    color: var(--ms-brand-ink);
+    padding: clamp(1.5rem, 3vw, 2.75rem);
+    box-shadow: 0 24px 50px -34px rgb(15 23 42 / 0.65);
+}
+
+/* Trama tecnica discreta: textura de membrete, no un degradado decorativo. */
+.microsite .ms-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image: repeating-linear-gradient(
+        135deg,
+        color-mix(in srgb, currentColor 5%, transparent) 0 1px,
+        transparent 1px 22px
+    );
+}
+
+.microsite .ms-hero::after {
+    content: attr(data-monogram);
+    position: absolute;
+    right: -0.05em;
+    bottom: -0.32em;
+    z-index: -1;
+    font-size: clamp(12rem, 28vw, 24rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.08em;
+    color: color-mix(in srgb, currentColor 7%, transparent);
+    pointer-events: none;
+    user-select: none;
+}
+
+.microsite .ms-hero__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.microsite .ms-identity {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.microsite .ms-monogram {
+    display: grid;
+    flex: 0 0 auto;
+    width: clamp(3.5rem, 7vw, 4.75rem);
+    height: clamp(3.5rem, 7vw, 4.75rem);
+    place-items: center;
+    border: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+    border-radius: 16px;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+    font-size: clamp(1.35rem, 3vw, 1.9rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}
+
+.microsite .ms-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.microsite .ms-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 1.75rem;
+    border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+    border-radius: 999px;
+    padding: 0.2rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.01em;
+}
+
+.microsite .ms-badge svg {
+    width: 0.85rem;
+    height: 0.85rem;
+}
+
+.microsite .ms-hero h1 {
+    max-width: 20ch;
+    margin: 0.85rem 0 0;
+    font-size: clamp(2rem, 4.6vw, 3.4rem);
+    font-weight: 750;
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+}
+
+.microsite .ms-rubro {
+    margin: 0.65rem 0 0;
+    font-size: 0.98rem;
+    font-weight: 600;
+}
+
+.microsite .ms-description {
+    max-width: 68ch;
+    margin: 1.35rem 0 0;
+    font-size: 0.98rem;
+    line-height: 1.75;
+    white-space: pre-line;
+}
+
+.microsite .ms-hero__actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+    min-width: min(100%, 15rem);
+}
+
+.microsite .ms-whatsapp {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    border-radius: 12px;
+    background: #25d366;
+    padding: 0.8rem 1.15rem;
+    color: #07301c;
+    font-size: 0.92rem;
+    font-weight: 750;
+    text-decoration: none;
+    box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.55);
+    transition: transform 160ms ease, background-color 160ms ease;
+}
+
+.microsite .ms-whatsapp:hover {
+    background: #3ce07a;
+    transform: translateY(-1px);
+}
+
+.microsite .ms-whatsapp svg {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+.microsite .ms-phone {
+    margin: 0;
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.microsite .ms-edit {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid color-mix(in srgb, currentColor 42%, transparent);
+    border-radius: 12px;
+    padding: 0.65rem 1rem;
+    color: inherit;
+    font-size: 0.88rem;
+    font-weight: 650;
+    text-decoration: none;
+    transition: background-color 160ms ease;
+}
+
+.microsite .ms-edit:hover {
+    background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.microsite .ms-facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 2rem 0 0;
+    border-top: 1px solid color-mix(in srgb, currentColor 24%, transparent);
+    padding-top: 1.35rem;
+}
+
+.microsite .ms-facts > div {
+    min-width: 0;
+}
+
+.microsite .ms-facts > div + div {
+    border-left: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+    padding-left: 1rem;
+}
+
+.microsite .ms-facts dt {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.microsite .ms-facts dd {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.microsite .ms-catalog-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.25rem;
+    margin-top: 2.75rem;
+}
+
+.microsite .ms-catalog-head h2 {
+    margin: 0;
+    color: var(--ms-ink);
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    font-weight: 750;
+    letter-spacing: -0.03em;
+}
+
+.microsite .ms-catalog-head p {
+    max-width: 62ch;
+    margin: 0.55rem 0 0;
+    color: var(--ms-muted);
+    font-size: 0.92rem;
+    line-height: 1.65;
+}
+
+.microsite .ms-search {
+    display: flex;
+    flex: 0 1 24rem;
+    gap: 0.5rem;
+}
+
+.microsite .ms-search .ms-search-field {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.microsite .ms-search svg {
+    position: absolute;
+    top: 50%;
+    left: 0.85rem;
+    width: 1rem;
+    height: 1rem;
+    color: #7a8494;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.microsite .ms-search input {
+    padding-left: 2.4rem;
+    border-radius: 12px;
+}
+
+.microsite .ms-search .btn {
+    border-radius: 12px;
+}
+
+.microsite .ms-results {
+    margin: 1rem 0 0;
+    color: var(--ms-muted);
+    font-size: 0.88rem;
+}
+
+.microsite .ms-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.35rem;
+    margin-top: 1.5rem;
+}
+
+.microsite .ms-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--ms-line);
+    border-radius: 18px;
+    background: var(--ms-paper);
+    box-shadow: 0 12px 28px -24px rgb(15 23 42 / 0.4);
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.microsite .ms-card:hover {
+    border-color: color-mix(in srgb, var(--ms-brand) 32%, var(--ms-line));
+    box-shadow: 0 22px 36px -26px rgb(15 23 42 / 0.5);
+    transform: translateY(-3px);
+}
+
+.microsite .ms-card__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-bottom: 1px solid var(--ms-line);
+    background:
+        radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--ms-brand) 12%, transparent), transparent 55%),
+        color-mix(in srgb, var(--ms-brand) 5%, #ffffff);
+    /* Un color de marca claro (ambar, celeste) no alcanza contraste como
+       monograma: se oscurece mezclandolo con tinta, sin cambiar el membrete. */
+    color: color-mix(in srgb, var(--ms-brand) 60%, #172033);
+    text-decoration: none;
+}
+
+.microsite .ms-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 300ms ease;
+}
+
+.microsite .ms-card:hover .ms-card__media img {
+    transform: scale(1.03);
+}
+
+.microsite .ms-card__monogram {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: clamp(2.6rem, 6vw, 3.6rem);
+    font-weight: 800;
+    letter-spacing: -0.06em;
+}
+
+.microsite .ms-card__monogram::after {
+    content: '';
+    position: absolute;
+    width: 6.5rem;
+    height: 6.5rem;
+    border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+    border-radius: 24px;
+    transform: rotate(12deg);
+}
+
+.microsite .ms-card__category {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.85rem;
+    border: 1px solid rgb(15 23 42 / 0.06);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.92);
+    padding: 0.25rem 0.6rem;
+    color: #374151;
+    font-size: 0.7rem;
+    font-weight: 650;
+    box-shadow: 0 4px 12px -8px rgb(15 23 42 / 0.5);
+}
+
+.microsite .ms-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1.15rem 1.2rem 1.25rem;
+}
+
+.microsite .ms-card__title {
+    margin: 0;
+    color: var(--ms-ink);
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+}
+
+.microsite .ms-card__title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.microsite .ms-card__title a:hover {
+    color: color-mix(in srgb, var(--ms-brand) 60%, #172033);
+}
+
+.microsite .ms-card__presentation {
+    margin: 0.35rem 0 0;
+    color: var(--ms-muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.microsite .ms-card__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin-top: 0.95rem;
+    color: var(--ms-ink);
+}
+
+.microsite .ms-card__price strong {
+    font-size: 1.8rem;
+    font-weight: 780;
+    letter-spacing: -0.04em;
+}
+
+.microsite .ms-card__price span {
+    color: var(--ms-muted);
+    font-size: 0.78rem;
+    font-weight: 550;
+}
+
+.microsite .ms-card__unit {
+    margin: 0.15rem 0 0;
+    color: var(--ms-muted);
+    font-size: 0.78rem;
+}
+
+.microsite .ms-card__tier {
+    margin: 0.55rem 0 0;
+    color: #0f766e;
+    font-size: 0.78rem;
+    font-weight: 650;
+}
+
+.microsite .ms-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 1rem;
+    margin: 1rem 0 0;
+    border-top: 1px solid var(--ms-line);
+    padding-top: 0.85rem;
+    color: var(--ms-muted);
+    font-size: 0.78rem;
+}
+
+.microsite .ms-card__meta strong {
+    color: var(--ms-ink);
+    font-weight: 650;
+}
+
+.microsite .ms-card__meta .ms-stock-ok {
+    color: #166534;
+}
+
+.microsite .ms-card__meta .ms-stock-off {
+    color: #64748b;
+}
+
+.microsite .ms-card__action {
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.microsite .ms-card__action .btn {
+    width: 100%;
+    border-radius: 12px;
+}
+
+.microsite .ms-btn-brand {
+    border-color: transparent;
+    background: var(--ms-brand);
+    color: var(--ms-brand-ink);
+}
+
+.microsite .ms-btn-brand:hover {
+    background: var(--ms-brand);
+    filter: brightness(1.08);
+}
+
+.microsite .ms-card.is-unavailable .ms-card__media {
+    filter: grayscale(0.75);
+}
+
+.microsite .ms-empty {
+    grid-column: 1 / -1;
+    border: 1px dashed #cbd2dc;
+    border-radius: 18px;
+    background: #ffffff;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+}
+
+.microsite .ms-empty h3 {
+    margin: 0;
+    color: var(--ms-ink);
+    font-size: 1.15rem;
+}
+
+.microsite .ms-empty p {
+    margin: 0.6rem auto 0;
+    max-width: 48ch;
+    color: var(--ms-muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+}
+
+/* Vista previa del editor: mismo membrete, en miniatura. */
+.microsite .ms-preview {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--ms-brand);
+    color: var(--ms-brand-ink);
+    padding: 1.25rem;
+}
+
+.microsite .ms-preview::after {
+    content: attr(data-monogram);
+    position: absolute;
+    right: -0.05em;
+    bottom: -0.35em;
+    font-size: 9rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.08em;
+    color: color-mix(in srgb, currentColor 8%, transparent);
+    pointer-events: none;
+}
+
+.microsite .ms-preview__name {
+    position: relative;
+    margin: 0.75rem 0 0;
+    font-size: 1.45rem;
+    font-weight: 750;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    overflow-wrap: anywhere;
+}
+
+.microsite .ms-preview__rubro {
+    position: relative;
+    margin: 0.4rem 0 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.microsite .ms-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.75rem;
+}
+
+.microsite .ms-swatch {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    box-shadow: 0 0 0 1px #cbd2dc;
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.microsite .ms-swatch:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 2px #64748b;
+}
+
+@media (max-width: 1023px) {
+    .microsite .ms-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .microsite .ms-facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        row-gap: 1.25rem;
+    }
+
+    .microsite .ms-facts > div:nth-child(odd) {
+        border-left: 0;
+        padding-left: 0;
+    }
+}
+
+@media (max-width: 639px) {
+    .microsite .ms-hero {
+        border-radius: 18px;
+        padding: 1.35rem;
+    }
+
+    .microsite .ms-identity {
+        gap: 0.85rem;
+    }
+
+    .microsite .ms-hero h1 {
+        font-size: clamp(1.75rem, 8vw, 2.3rem);
+    }
+
+    .microsite .ms-hero__actions {
+        width: 100%;
+    }
+
+    .microsite .ms-facts {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .microsite .ms-facts > div {
+        border-left: 0 !important;
+        padding: 0.85rem 0 0 !important;
+    }
+
+    .microsite .ms-facts > div:first-child {
+        padding-top: 0 !important;
+    }
+
+    .microsite .ms-facts > div + div {
+        margin-top: 0.85rem;
+        border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+    }
+
+    .microsite .ms-grid {
+        grid-template-columns: 1fr;
+        gap: 1.1rem;
+    }
+
+    .microsite .ms-search {
+        flex-basis: 100%;
+    }
+
+    .microsite .ms-search .btn {
+        padding-inline: 0.85rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .microsite .ms-card,
+    .microsite .ms-card__media img,
+    .microsite .ms-whatsapp,
+    .microsite .ms-swatch {
+        transition: none;
+    }
+
+    .microsite .ms-card:hover,
+    .microsite .ms-whatsapp:hover {
+        transform: none;
+    }
+}
