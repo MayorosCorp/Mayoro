@@ -17,9 +17,9 @@ class QuotationTotalsTest extends TestCase
     }
 
     /**
-     * HU-04 — Given: un precio unitario referencial de S/ 10.00
+     * HU-04 — Given: un precio por bulto de S/ 120.00
      * When: la bodega cotiza 10 bultos
-     * Then: el subtotal es S/ 100.00, el IGV 18% es S/ 18.00 y el total S/ 118.00
+     * Then: el subtotal es S/ 1,200.00, el IGV 18% es S/ 216.00 y el total S/ 1,416.00
      */
 
     // php artisan test --filter=test_calcula_subtotal_igv_y_total_con_tasa_de_igv_del_18_por_ciento
@@ -27,15 +27,15 @@ class QuotationTotalsTest extends TestCase
     {
         $service = new QuotationService(Mockery::mock(WhatsAppLinkGenerator::class));
 
-        $totales = $service->calcularTotales(10.00, 10);
+        $totales = $service->calcularTotales(120.00, 10);
 
-        $this->assertSame(100.00, $totales['subtotal']);
-        $this->assertSame(18.00, $totales['igv']);
-        $this->assertSame(118.00, $totales['total']);
+        $this->assertSame(1200.00, $totales['subtotal']);
+        $this->assertSame(216.00, $totales['igv']);
+        $this->assertSame(1416.00, $totales['total']);
     }
 
     /**
-     * Given: un precio unitario con decimales
+     * Given: un precio por bulto con decimales
      * When: se desglosa la cotización
      * Then: los importes se redondean a dos decimales para evitar residuos de punto flotante
      */

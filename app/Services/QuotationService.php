@@ -28,13 +28,14 @@ class QuotationService
     }
 
     /**
-     * Calcula el desglose economico de la cotizacion: subtotal, IGV 18% y total.
+     * Calcula el desglose economico de la cotizacion sobre el precio del bulto,
+     * que es la unidad de comercio de Mayoro: subtotal, IGV 18% y total.
      *
      * @return array{subtotal: float, igv: float, total: float}
      */
-    public function calcularTotales(float $precioUnitario, int $cantidad): array
+    public function calcularTotales(float $precioBulto, int $cantidadBultos): array
     {
-        $subtotal = round($precioUnitario * $cantidad, 2);
+        $subtotal = round($precioBulto * $cantidadBultos, 2);
         $igv = round($subtotal * self::IGV_RATE, 2);
 
         return [
@@ -49,8 +50,8 @@ class QuotationService
      */
     public function resumirCotizacion(User $bodega, Product $producto, int $cantidad): string
     {
-        $totales = $this->calcularTotales($producto->precio_unitario_calculado, $cantidad);
-        $precioUnitario = $producto->precio_unitario_calculado;
+        $precioBulto = (float) $producto->precio_bulto;
+        $totales = $this->calcularTotales($precioBulto, $cantidad);
 
         return implode("\n", [
             'Hola '.($producto->distribuidor?->razon_social ?? '').', le escribo de parte de '.($bodega->razon_social ?? '').'.',
@@ -62,7 +63,7 @@ class QuotationService
             'Unidades por bulto: '.$producto->unidades_por_bulto,
             'Cantidad de bultos: '.$cantidad.' (MOQ: '.$producto->moq_cantidad_minima.')',
             '',
-            'Precio referencial: S/ '.number_format($precioUnitario, 2).' por unidad',
+            'Precio referencial: S/ '.number_format($precioBulto, 2).' por bulto',
             'Subtotal: S/ '.number_format($totales['subtotal'], 2),
             'IGV (18%): S/ '.number_format($totales['igv'], 2),
             'Total estimado: S/ '.number_format($totales['total'], 2),

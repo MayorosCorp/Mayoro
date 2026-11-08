@@ -37,8 +37,12 @@ class QuoteController extends Controller
      */
     public function create(Request $request): View
     {
+        // Solo se ofrece lo que el servidor aceptaria: producto publicado y con
+        // stock suficiente para cubrir su propio MOQ (RN-05).
         $productos = Product::with('distribuidor')
             ->where('is_active', true)
+            ->where('stock_disponible', '>=', 1)
+            ->whereColumn('stock_disponible', '>=', 'moq_cantidad_minima')
             ->orderBy('nombre')
             ->get();
 
@@ -59,7 +63,18 @@ class QuoteController extends Controller
         $producto = Product::with('distribuidor')->findOrFail($request->integer('producto_id'));
         $cantidad = (int) $request->integer('cantidad_solicitada');
 
-        $totales = $this->quotation->calcularTotales($producto->precio_unitario_calculado, $cantidad);
+        // Blindaje adicional ante una carrera entre la validacion y el guardado:
+        // el stock y la publicacion se vuelven a comprobar aqui.
+        if ($producto->esta_agotado || $cantidad > $producto->stock_disponible) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'cantidad_solicitada' => 'El producto cambio de disponibilidad mientras generabas la cotizacion. Revisa el catalogo antes de intentarlo de nuevo.',
+                ]);
+        }
+
+        $precioBulto = (float) $producto->precio_bulto;
+        $totales = $this->quotation->calcularTotales($precioBulto, $cantidad);
         $telefono = (string) $producto->distribuidor?->telefono_whatsapp;
         $mensaje = $this->quotation->resumirCotizacion($request->user(), $producto, $cantidad);
 
@@ -72,13 +87,19 @@ class QuoteController extends Controller
             'bodega_id' => $request->user()->id,
             'distribuidor_id' => $producto->distribuidor_id,
             'cantidad_solicitada' => $cantidad,
+            // Snapshot del bulto: la cotizacion queda congelada con las
+            // condiciones vigentes al generarla.
+            'precio_bulto' => $precioBulto,
+            'unidades_por_bulto' => $producto->unidades_por_bulto,
             'precio_unitario' => $producto->precio_unitario_calculado,
             'subtotal' => $totales['subtotal'],
             'igv' => $totales['igv'],
             'total' => $totales['total'],
             'telefono_destino' => $telefono,
             'url_whatsapp' => $urlWhatsapp,
-            'estado' => $urlWhatsapp !== null ? 'enviada' : 'pendiente',
+            // Mayoro genera el enlace, no entrega el mensaje: "generada" es el
+            // unico estado que puede afirmar sin inventar datos.
+            'estado' => 'generada',
         ]);
 
         if ($urlWhatsapp === null) {
