@@ -12,15 +12,15 @@ class SupplierController extends Controller
 {
     /**
      * Ficha CI-COD-14: el módulo de proveedores se apoya en los comercios
-     * reales de usuarios_b2b con rol distribuidor. No existe una tabla
-     * `proveedores`: el proveedor mayorista es el propio comercio distribuidor.
+     * reales de usuarios_b2b con rol Empresario. No existe una tabla
+     * `proveedores`: el proveedor mayorista es el propio Empresario validado.
      */
     public function index(Request $request): View
     {
         $busqueda = trim((string) $request->query('q', ''));
 
         $distribuidores = User::query()
-            ->where('rol', 'distribuidor')
+            ->where('rol', User::ROL_EMPRESARIO)
             ->withCount(['productos' => fn (Builder $query) => $query->where('is_active', true)])
             ->when($busqueda !== '', function (Builder $query) use ($busqueda): void {
                 $query->where(function (Builder $interno) use ($busqueda): void {
@@ -44,7 +44,7 @@ class SupplierController extends Controller
     public function show(string $supplier): View
     {
         $distribuidor = User::query()
-            ->where('rol', 'distribuidor')
+            ->where('rol', User::ROL_EMPRESARIO)
             ->withCount(['productos' => fn (Builder $query) => $query->where('is_active', true)])
             ->findOrFail($supplier);
 

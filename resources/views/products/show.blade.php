@@ -50,7 +50,7 @@
                     </a>
                 </p>
 
-                @if (Auth::check() && Auth::user()->rol === 'distribuidor' && $product->distribuidor_id === Auth::id())
+                @if (Auth::check() && Auth::user()->esEmpresario() && $product->distribuidor_id === Auth::id())
                     <a class="btn ghost" href="{{ route('products.edit', $product->id) }}" data-testid="producto-editar">
                         Editar producto
                     </a>
@@ -132,38 +132,25 @@
                     <a class="btn ghost w-full" href="{{ route('suppliers.show', $product->distribuidor_id) }}">
                         Ver catálogo del distribuidor
                     </a>
-                @elseif (Auth::check() && Auth::user()->rol === 'bodega')
+                @elseif (! Auth::check() || Auth::user()->esPersonaNatural())
                     <h2 class="mt-0 text-lg font-semibold text-slate-900">Solicitar cotización</h2>
                     <p class="mb-4 mt-2 text-sm leading-6 text-slate-600">
-                        El pedido mínimo es de {{ $product->moq_cantidad_minima }} bultos. Mayoro prepara
-                        el resumen y tú lo envías al distribuidor por WhatsApp.
+                        El pedido mínimo es de {{ $product->moq_cantidad_minima }} bultos. No necesitas
+                        cuenta ni RUC: Mayoro prepara el resumen y tú lo envías al distribuidor por WhatsApp.
                     </p>
                     <a class="btn w-full" href="{{ route('quotes.create', ['producto' => $product->id]) }}"
                        data-testid="producto-cotizar">
                         Cotizar pedido
                     </a>
-                @elseif (Auth::check())
-                    <h2 class="mt-0 text-lg font-semibold text-slate-900">Acceso exclusivo para bodegas</h2>
+                @else
+                    <h2 class="mt-0 text-lg font-semibold text-slate-900">Producto de otro Empresario</h2>
                     <p class="mb-4 mt-2 text-sm leading-6 text-slate-600">
-                        El flujo de cotización está habilitado para cuentas con rol bodega.
+                        Tu cuenta administra su propio catálogo, por eso no genera solicitudes de compra.
+                        Puedes volver al catálogo o revisar tus productos publicados.
                     </p>
                     <a class="btn ghost w-full" href="{{ route('products.index') }}">Volver al catálogo</a>
-                @else
-                    {{-- Ficha CI-COD-13: el escenario exige modal informativo, no una tarjeta --}}
-                    <h2 class="mt-0 text-lg font-semibold text-slate-900">Cotiza este producto en mayorista</h2>
-                    <p class="mb-4 mt-2 text-sm leading-6 text-slate-600">
-                        El pedido mínimo es de {{ $product->moq_cantidad_minima }} bultos.
-                        Inicia sesión o crea tu cuenta de bodega para generar el resumen de WhatsApp.
-                    </p>
-                    <button class="btn w-full" type="button" data-modal-abrir="authModal">
-                        Cotizar pedido
-                    </button>
                 @endif
             </section>
         </aside>
     </div>
-
-    @unless (Auth::check())
-        <x-auth-modal :return-url="route('products.show', $product->id)" />
-    @endunless
 @endsection

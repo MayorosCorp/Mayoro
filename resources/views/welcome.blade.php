@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="Mayoro: plataforma B2B que conecta bodegas con distribuidores mayoristas. Catálogo con precios por bulto, MOQ y cotizacion directa por WhatsApp.">
+    <meta name="description" content="Mayoro: plataforma B2B que conecta compradores con distribuidores mayoristas. Catálogo con precios por bulto, MOQ y cotizacion directa por WhatsApp, sin RUC para explorar.">
     <title>Mayoro &mdash; Conexion Mayorista B2B</title>
     <style>
         :root {
@@ -98,18 +98,19 @@
 
 <header class="hero">
     <div class="wrap">
-        <h1>Conecta tu bodega con distribuidores mayoristas</h1>
+        <h1>Conecta tu negocio con distribuidores mayoristas</h1>
         <p>
-            Mayoro es la plataforma B2B donde los comercios publican sus productos con
-            precio por bulto y pedido minimo, y las bodegas cotizan directo con el
-            distribuidor por WhatsApp, sin llamadas intermedias.
+            Mayoro es la plataforma B2B donde los Empresarios publican sus productos con
+            precio por bulto y pedido minimo, y cualquier Persona natural cotiza directo
+            con el distribuidor por WhatsApp, sin llamadas intermedias ni RUC para explorar.
         </p>
         <div class="actions">
             @guest
-                <a class="btn accent" href="{{ route('auth.register') }}">Crear cuenta de comercio</a>
+                <a class="btn accent" href="{{ route('auth.register') }}">Crear cuenta gratis</a>
                 <a class="btn ghost" href="{{ route('auth.login') }}">Ya tengo cuenta</a>
             @endauth
             <a class="btn ghost" href="{{ route('products.index') }}">Ver catalogo</a>
+            <a class="btn ghost" href="{{ route('quotes.create') }}">Cotizar sin cuenta</a>
         </div>
 
         <div class="stats">
@@ -119,11 +120,11 @@
             </div>
             <div class="stat">
                 <div class="value">{{ $metricas['distribuidores'] }}</div>
-                <div class="label">Distribuidores mayoristas</div>
+                <div class="label">Empresarios validados</div>
             </div>
             <div class="stat">
                 <div class="value">{{ $metricas['bodegas'] }}</div>
-                <div class="label">Bodegas conectadas</div>
+                <div class="label">Personas naturales</div>
             </div>
         </div>
     </div>
@@ -139,11 +140,11 @@
             <div class="card">
                 <h3>El catalogo aun esta vacio</h3>
                 <p>
-                    Registrate como distribuidor y publica tu primer producto con precio por
-                    bulto y pedido minimo para que las bodegas lo vean.
+                    Crea tu cuenta como Persona natural y convertiete en Empresario para publicar
+                    tu primer producto con precio por bulto y pedido minimo.
                 </p>
                 <p style="margin-top:1rem">
-                    <a class="btn" href="{{ route('auth.register') }}">Publicar mi primer producto</a>
+                    <a class="btn" href="{{ route('auth.register') }}">Empezar en Mayoro</a>
                 </p>
             </div>
         @else
@@ -170,13 +171,13 @@
         <div class="grid">
             <div class="card">
                 <span class="step">1</span>
-                <h3>Registra tu comercio</h3>
-                <p>Alta con RUC, WhatsApp y rol: bodega o distribuidor.</p>
+                <h3>Explora sin cuenta</h3>
+                <p>El catálogo es público: compara precios por bulto y MOQ sin RUC ni registro.</p>
             </div>
             <div class="card">
                 <span class="step">2</span>
-                <h3>Publica o explora precios</h3>
-                <p>El distribuidor define precio por bulto, unidades y MOQ. La bodega compara el catalogo.</p>
+                <h3>Cotiza o publica</h3>
+                <p>Cualquier Persona natural cotiza. Para vender, conviértete en Empresario validando tu RUC.</p>
             </div>
             <div class="card">
                 <span class="step">3</span>
@@ -188,9 +189,10 @@
 
     <section class="cta">
         <h2>Empieza a mover mayorista</h2>
-        <p>Registro gratuito para bodegas y distribuidores. Solo necesitas tu RUC y tu numero de WhatsApp.</p>
+        <p>Cotiza sin cuenta ni RUC, o crea una cuenta gratuita como Persona natural para conservar tu historial.</p>
         <p>
-            <a class="btn accent" href="{{ route('auth.register') }}">Registrar mi comercio</a>
+            <a class="btn accent" href="{{ route('quotes.create') }}">Cotizar sin cuenta</a>
+            <a class="btn ghost" href="{{ route('auth.register') }}">Crear cuenta gratis</a>
         </p>
     </section>
 
@@ -199,7 +201,7 @@
 <footer>
     <div class="wrap">
         <div class="brand">Mayoro</div>
-        <p>Plataforma B2B de conexion mayorista para bodegas y distribuidores.</p>
+        <p>Plataforma B2B de conexión mayorista entre compradores y distribuidores.</p>
         <p>Proyecto academico &mdash; Pruebas y Calidad de Software &middot; Universidad Continental.</p>
     </div>
 </footer>

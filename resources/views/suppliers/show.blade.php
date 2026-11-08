@@ -32,7 +32,8 @@
             Productos publicados
         </h2>
         <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            Para cotizar un producto necesitas una cuenta de bodega registrada.
+            Puedes cotizar sin cuenta ni RUC: Mayoro prepara el enlace de WhatsApp y tú envías el mensaje.
+            Con una cuenta gratuita, además, conservas el historial.
         </p>
     </div>
 
@@ -91,14 +92,14 @@
                         <span class="btn disabled w-full" aria-disabled="true" data-testid="producto-sin-stock">
                             Temporalmente sin stock
                         </span>
-                    @elseif (Auth::check() && Auth::user()->rol === 'bodega')
+                    @elseif (! Auth::check() || Auth::user()->esPersonaNatural())
                         <a class="btn w-full" href="{{ route('quotes.create', ['producto' => $producto->id]) }}"
                            data-testid="producto-cotizar">
                             Cotizar pedido
                         </a>
                     @else
-                        <a class="btn w-full" href="{{ route('auth.login', ['returnUrl' => route('products.show', $producto->id)]) }}">
-                            Ingresar para cotizar
+                        <a class="btn ghost w-full" href="{{ route('products.show', $producto->id) }}">
+                            Ver detalle
                         </a>
                     @endif
                 </div>

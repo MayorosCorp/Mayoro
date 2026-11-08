@@ -15,7 +15,7 @@
             </p>
         </div>
 
-        @if (Auth::check() && Auth::user()->rol === 'distribuidor')
+        @if (Auth::check() && Auth::user()->esEmpresario())
             <a class="btn accent shrink-0" href="{{ route('products.create') }}" data-testid="catalogo-publicar">
                 + Publicar Nuevo Producto
             </a>
@@ -128,24 +128,18 @@
                         @elseif ($prod->estado_stock === 'stock_insuficiente')
                             <p class="m-0 text-center text-xs text-slate-500">Stock insuficiente para el pedido mínimo</p>
                         @endif
-                    @elseif (Auth::check() && Auth::user()->rol === 'bodega')
+                    @elseif (! Auth::check() || Auth::user()->esPersonaNatural())
                         <a class="btn w-full" href="{{ route('quotes.create', ['producto' => $prod->id]) }}"
                            data-testid="producto-cotizar">
                             Cotizar pedido
                         </a>
-                    @elseif (Auth::check())
+                    @else
                         <a class="btn ghost w-full" href="{{ route('products.show', $prod->id) }}">
                             Ver detalle
                         </a>
-                    @else
-                        {{-- Ficha CI-COD-13: cada tarjeta declara su propio returnUrl --}}
-                        <button class="btn w-full" type="button" data-modal-abrir="authModal"
-                                data-return-url="{{ route('products.show', $prod->id) }}">
-                            Ingresar para cotizar
-                        </button>
                     @endif
 
-                    @if (Auth::check() && Auth::user()->rol === 'distribuidor' && $prod->distribuidor_id === Auth::id())
+                    @if (Auth::check() && Auth::user()->esEmpresario() && $prod->distribuidor_id === Auth::id())
                         <a class="btn ghost w-full" href="{{ route('products.edit', $prod->id) }}">Editar producto</a>
                     @endif
 
@@ -168,8 +162,4 @@
     @if ($products->hasPages())
         <div class="mt-8">{{ $products->links() }}</div>
     @endif
-
-    @guest
-        <x-auth-modal />
-    @endguest
 @endsection
