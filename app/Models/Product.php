@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -45,6 +46,40 @@ class Product extends Model
     public function distribuidor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'distribuidor_id');
+    }
+
+    /**
+     * RN-04: tramos opcionales de descuento por volumen, ordenados por umbral
+     * ascendente. Un producto sin tramos cotiza siempre a su precio base.
+     */
+    public function tramosPrecio(): HasMany
+    {
+        return $this->hasMany(ProductPriceTier::class, 'producto_id')
+            ->orderBy('cantidad_minima');
+    }
+
+    /**
+     * Devuelve el tramo de mayor umbral que no supera la cantidad pedida. Los
+     * tramos son mutuamente excluyentes: nunca se combinan ni se suman.
+     */
+    public function tramoPrecioPara(int $cantidad): ?ProductPriceTier
+    {
+        $tramos = $this->relationLoaded('tramosPrecio')
+            ? $this->tramosPrecio
+            : $this->tramosPrecio()->get();
+
+        return $tramos
+            ->filter(fn (ProductPriceTier $tramo): bool => $tramo->cantidad_minima <= $cantidad)
+            ->sortByDesc('cantidad_minima')
+            ->first();
+    }
+
+    /**
+     * Precio por bulto aplicable a una cantidad: el tramo vigente o el base.
+     */
+    public function precioBultoPara(int $cantidad): float
+    {
+        return (float) ($this->tramoPrecioPara($cantidad)?->precio_bulto ?? $this->precio_bulto);
     }
 
     /**

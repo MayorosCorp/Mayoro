@@ -67,6 +67,11 @@
                 <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
                     <dt class="text-xs font-medium uppercase tracking-wide text-slate-500">Precio por bulto</dt>
                     <dd class="m-0 mt-1 font-semibold text-slate-900">S/ {{ number_format((float) $quote->precio_bulto, 2) }}</dd>
+                    @if ($quote->tramo_cantidad_minima)
+                        <dd class="m-0 mt-1 text-xs font-normal text-emerald-700" data-testid="cotizacion-tramo">
+                            Tramo por volumen aplicado desde {{ $quote->tramo_cantidad_minima }} bultos
+                        </dd>
+                    @endif
                 </div>
             </dl>
         </section>

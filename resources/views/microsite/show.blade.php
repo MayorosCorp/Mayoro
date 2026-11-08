@@ -162,6 +162,13 @@
                         <p class="m-0 text-xs text-slate-500">
                             Unitario referencial: S/ {{ number_format($producto->precio_unitario_calculado, 2) }}
                         </p>
+                        @if ($producto->tramosPrecio->isNotEmpty())
+                            @php $mejorTramo = $producto->tramosPrecio->last(); @endphp
+                            <p class="m-0 text-xs font-medium text-emerald-700" data-testid="producto-tramo">
+                                Desde {{ $mejorTramo->cantidad_minima }} bultos:
+                                S/ {{ number_format((float) $mejorTramo->precio_bulto, 2) }} / bulto
+                            </p>
+                        @endif
                     </div>
 
                     <div class="flex flex-wrap gap-1.5">

@@ -39,6 +39,11 @@
                         S/ {{ number_format((float) $cotizacion['precio_bulto'], 2) }}
                     </dd>
                 </div>
+                @if (! empty($cotizacion['tramo_cantidad_minima']))
+                    <p class="m-0 text-xs font-medium text-emerald-700" data-testid="cotizacion-tramo">
+                        Se aplicó el precio por volumen desde {{ $cotizacion['tramo_cantidad_minima'] }} bultos.
+                    </p>
+                @endif
                 <div class="flex items-center justify-between gap-4">
                     <dt class="text-slate-600">Bultos solicitados</dt>
                     <dd class="m-0 font-semibold text-slate-900">{{ $cotizacion['cantidad_solicitada'] }}</dd>

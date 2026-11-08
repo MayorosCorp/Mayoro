@@ -56,6 +56,7 @@ class MicrositeController extends Controller
         $busqueda = trim((string) $request->query('q', ''));
 
         $productos = Product::query()
+            ->with('tramosPrecio')
             ->where('distribuidor_id', $empresario->id)
             ->where('is_active', true)
             ->when($busqueda !== '', function (Builder $query) use ($busqueda): void {

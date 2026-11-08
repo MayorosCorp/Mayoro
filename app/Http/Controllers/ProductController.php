@@ -6,11 +6,13 @@ use App\Events\ProductUpdated;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use App\Models\ProductPriceTier;
 use App\Services\ProductImageStorage;
 use App\Services\QuotationService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -33,7 +35,7 @@ class ProductController extends Controller
         $busqueda = trim((string) $request->query('q', ''));
         $categoria = trim((string) $request->query('categoria', ''));
 
-        $products = Product::with('distribuidor')
+        $products = Product::with(['distribuidor', 'tramosPrecio'])
             ->when($busqueda !== '', function (Builder $query) use ($busqueda): void {
                 $query->where(function (Builder $interno) use ($busqueda): void {
                     $interno->where('nombre', 'like', "%{$busqueda}%")
@@ -85,20 +87,24 @@ class ProductController extends Controller
             ? $this->imagenes->store($request->file('imagen'))
             : null;
 
-        Product::create([
-            'distribuidor_id' => $request->user()->id,
-            'nombre' => $nombre,
-            'categoria' => $categoria,
-            'presentacion' => $presentacion,
-            'unidades_por_bulto' => $unidades,
-            'precio_bulto' => $precioBulto,
-            'moq_cantidad_minima' => (int) $validated['moq_cantidad_minima'],
-            'stock_disponible' => (int) $validated['stock_disponible'],
-            'precio_unitario_sugerido' => $precioUnitario,
-            'descripcion' => $descripcion,
-            'imagen_url' => $imagenUrl,
-            'is_active' => true,
-        ]);
+        DB::transaction(function () use ($request, $validated, $nombre, $categoria, $presentacion, $descripcion, $unidades, $precioBulto, $precioUnitario, $imagenUrl) {
+            $product = Product::create([
+                'distribuidor_id' => $request->user()->id,
+                'nombre' => $nombre,
+                'categoria' => $categoria,
+                'presentacion' => $presentacion,
+                'unidades_por_bulto' => $unidades,
+                'precio_bulto' => $precioBulto,
+                'moq_cantidad_minima' => (int) $validated['moq_cantidad_minima'],
+                'stock_disponible' => (int) $validated['stock_disponible'],
+                'precio_unitario_sugerido' => $precioUnitario,
+                'descripcion' => $descripcion,
+                'imagen_url' => $imagenUrl,
+                'is_active' => true,
+            ]);
+
+            $this->sincronizarTramos($product, $validated['tramos'] ?? []);
+        });
 
         return redirect()->route('products.index')->with('success', 'Producto publicado exitosamente en el catálogo mayorista.');
     }
@@ -134,7 +140,7 @@ class ProductController extends Controller
     public function show(string|int $product): View
     {
         $productModel = is_numeric($product)
-            ? Product::with('distribuidor')->findOrFail($product)
+            ? Product::with(['distribuidor', 'tramosPrecio'])->findOrFail($product)
             : $product;
 
         // El desglose de la ficha es por bulto, la unidad de comercio de
@@ -158,7 +164,7 @@ class ProductController extends Controller
     {
         $productModel = $this->buscarProductoPropio($request, $product);
 
-        return view('products.edit', ['product' => $productModel->load('distribuidor')]);
+        return view('products.edit', ['product' => $productModel->load(['distribuidor', 'tramosPrecio'])]);
     }
 
     public function update(UpdateProductRequest $request, string|int $product): RedirectResponse
@@ -177,17 +183,21 @@ class ProductController extends Controller
             $this->imagenes->eliminar($imagenAnterior);
         }
 
-        $productModel->update([
-            'nombre' => $this->sanitizeInput($validated['nombre']),
-            'categoria' => $this->sanitizeInput($validated['categoria']),
-            'presentacion' => $this->sanitizeInput($validated['presentacion']),
-            'descripcion' => isset($validated['descripcion']) ? $this->sanitizeInput($validated['descripcion']) : null,
-            'unidades_por_bulto' => $unidades,
-            'precio_bulto' => $precioBulto,
-            'precio_unitario_sugerido' => round($precioBulto / $unidades, 2),
-            'moq_cantidad_minima' => (int) $validated['moq_cantidad_minima'],
-            'stock_disponible' => (int) $validated['stock_disponible'],
-        ]);
+        DB::transaction(function () use ($productModel, $validated, $unidades, $precioBulto) {
+            $productModel->update([
+                'nombre' => $this->sanitizeInput($validated['nombre']),
+                'categoria' => $this->sanitizeInput($validated['categoria']),
+                'presentacion' => $this->sanitizeInput($validated['presentacion']),
+                'descripcion' => isset($validated['descripcion']) ? $this->sanitizeInput($validated['descripcion']) : null,
+                'unidades_por_bulto' => $unidades,
+                'precio_bulto' => $precioBulto,
+                'precio_unitario_sugerido' => round($precioBulto / $unidades, 2),
+                'moq_cantidad_minima' => (int) $validated['moq_cantidad_minima'],
+                'stock_disponible' => (int) $validated['stock_disponible'],
+            ]);
+
+            $this->sincronizarTramos($productModel, $validated['tramos'] ?? []);
+        });
 
         ProductUpdated::dispatch($productModel);
 
@@ -230,6 +240,34 @@ class ProductController extends Controller
 
         return redirect()->route('products.show', $productModel->id)
             ->with('success', 'Producto republicado en el catálogo mayorista.');
+    }
+
+    /**
+     * RN-04: persiste la lista completa de tramos que llego del formulario.
+     * La edicion reemplaza el conjunto anterior para que el distribuidor pueda
+     * eliminar un tramo sin dejar filas huerfanas.
+     *
+     * @param  array<int, array{cantidad_minima: int|string, precio_bulto: int|string}>  $tramos
+     */
+    private function sincronizarTramos(Product $product, array $tramos): void
+    {
+        // La relacion ordena por umbral para la lectura; el borrado se hace sin
+        // ese ORDER BY porque SQLite no lo admite en un DELETE.
+        ProductPriceTier::query()->where('producto_id', $product->id)->delete();
+
+        if ($tramos === []) {
+            return;
+        }
+
+        $product->tramosPrecio()->createMany(
+            collect($tramos)
+                ->map(fn (array $tramo): array => [
+                    'cantidad_minima' => (int) $tramo['cantidad_minima'],
+                    'precio_bulto' => round((float) $tramo['precio_bulto'], 2),
+                ])
+                ->values()
+                ->all()
+        );
     }
 
     /**

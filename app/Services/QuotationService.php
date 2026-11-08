@@ -28,6 +28,23 @@ class QuotationService
     }
 
     /**
+     * RN-04: resuelve el precio por bulto que corresponde a la cantidad. Los
+     * tramos son mutuamente excluyentes: se toma el de mayor umbral que no
+     * supere la cantidad pedida; sin tramo aplicable rige el precio base.
+     *
+     * @return array{precio_bulto: float, tramo_cantidad_minima: ?int}
+     */
+    public function resolverPrecioBulto(Product $producto, int $cantidad): array
+    {
+        $tramo = $producto->tramoPrecioPara($cantidad);
+
+        return [
+            'precio_bulto' => (float) ($tramo?->precio_bulto ?? $producto->precio_bulto),
+            'tramo_cantidad_minima' => $tramo?->cantidad_minima,
+        ];
+    }
+
+    /**
      * Calcula el desglose economico de la cotizacion sobre el precio del bulto,
      * que es la unidad de comercio de Mayoro: subtotal, IGV 18% y total.
      *
@@ -47,15 +64,22 @@ class QuotationService
 
     /**
      * Compone el resumen comercial que el solicitante envia por WhatsApp. Si no
-     * hay cuenta (visitante), el mensaje no inventa una identidad.
+     * hay cuenta (visitante), el mensaje no inventa una identidad. El precio y
+     * el tramo llegan resueltos desde el controlador para que el mensaje y la
+     * cotizacion guardada cuenten exactamente la misma historia.
      */
-    public function resumirCotizacion(?User $solicitante, Product $producto, int $cantidad): string
-    {
-        $precioBulto = (float) $producto->precio_bulto;
+    public function resumirCotizacion(
+        ?User $solicitante,
+        Product $producto,
+        int $cantidad,
+        ?float $precioBulto = null,
+        ?int $tramoDesde = null
+    ): string {
+        $precioBulto ??= $this->resolverPrecioBulto($producto, $cantidad)['precio_bulto'];
         $totales = $this->calcularTotales($precioBulto, $cantidad);
         $remitente = $solicitante?->razon_social ?: 'un comprador de Mayoro';
 
-        return implode("\n", [
+        $lineas = [
             'Hola '.($producto->distribuidor?->razon_social ?? '').', le escribo de parte de '.$remitente.'.',
             '',
             'Solicito cotizar el siguiente producto de su catalogo mayorista:',
@@ -65,12 +89,22 @@ class QuotationService
             'Unidades por bulto: '.$producto->unidades_por_bulto,
             'Cantidad de bultos: '.$cantidad.' (MOQ: '.$producto->moq_cantidad_minima.')',
             '',
-            'Precio referencial: S/ '.number_format($precioBulto, 2).' por bulto',
+        ];
+
+        if ($tramoDesde !== null) {
+            $lineas[] = 'Precio por volumen (desde '.$tramoDesde.' bultos): S/ '.number_format($precioBulto, 2).' por bulto';
+        } else {
+            $lineas[] = 'Precio referencial: S/ '.number_format($precioBulto, 2).' por bulto';
+        }
+
+        $lineas = array_merge($lineas, [
             'Subtotal: S/ '.number_format($totales['subtotal'], 2),
             'IGV (18%): S/ '.number_format($totales['igv'], 2),
             'Total estimado: S/ '.number_format($totales['total'], 2),
             '',
             'Quedo atento a su confirmación. Gracias.',
         ]);
+
+        return implode("\n", $lineas);
     }
 }
