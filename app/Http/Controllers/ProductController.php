@@ -151,7 +151,7 @@ class ProductController extends Controller
 
     /**
      * El formulario de edición también exige propiedad: sin este control un
-     * distribuidor podía abrir el formulario de otro catálogo y solo fallaría
+     * Empresario podía abrir el formulario de otro catálogo y solo fallaría
      * al guardar, con un error en lugar de un 403 claro.
      */
     public function edit(Request $request, string|int $product): View
@@ -233,7 +233,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Un distribuidor solo puede administrar los productos que él publicó.
+     * Un Empresario solo puede administrar los productos que él publicó.
      */
     private function buscarProductoPropio(Request $request, string|int $product): Product
     {

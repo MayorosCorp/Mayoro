@@ -22,11 +22,11 @@ class ProductImageUploadTest extends TestCase
         Storage::fake('public');
 
         $this->distribuidor = User::create([
-            'ruc_empresa' => '20601234567',
+            'ruc_empresa' => '20601234565',
             'razon_social' => 'Distribuidora Central S.A.C.',
             'email_contacto' => 'ventas@central.pe',
             'telefono_whatsapp' => '+51 987 654 321',
-            'rol' => 'distribuidor',
+            'rol' => 'empresario',
             'password' => bcrypt('password123'),
         ]);
     }

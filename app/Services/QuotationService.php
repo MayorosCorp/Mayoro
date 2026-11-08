@@ -46,15 +46,17 @@ class QuotationService
     }
 
     /**
-     * Compone el resumen comercial que el bodeguero envia por WhatsApp.
+     * Compone el resumen comercial que el solicitante envia por WhatsApp. Si no
+     * hay cuenta (visitante), el mensaje no inventa una identidad.
      */
-    public function resumirCotizacion(User $bodega, Product $producto, int $cantidad): string
+    public function resumirCotizacion(?User $solicitante, Product $producto, int $cantidad): string
     {
         $precioBulto = (float) $producto->precio_bulto;
         $totales = $this->calcularTotales($precioBulto, $cantidad);
+        $remitente = $solicitante?->razon_social ?: 'un comprador de Mayoro';
 
         return implode("\n", [
-            'Hola '.($producto->distribuidor?->razon_social ?? '').', le escribo de parte de '.($bodega->razon_social ?? '').'.',
+            'Hola '.($producto->distribuidor?->razon_social ?? '').', le escribo de parte de '.$remitente.'.',
             '',
             'Solicito cotizar el siguiente producto de su catalogo mayorista:',
             '',

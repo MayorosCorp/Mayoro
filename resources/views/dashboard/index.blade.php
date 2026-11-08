@@ -30,12 +30,12 @@
         </div>
     </div>
 
-    @if (auth()->user()->rol === 'distribuidor')
+    @if (auth()->user()->esEmpresario())
         <div class="card mt-6">
             <h2 class="mt-0 text-lg font-semibold text-slate-900">Gestionar mi catálogo mayorista</h2>
             <p class="mt-2 text-sm leading-6 text-slate-600">
                 Publica un producto con sus condiciones de bulto, MOQ, stock e imagen, o administra
-                los que ya están publicados. El catálogo es público: cualquier bodega puede verlo.
+                los que ya están publicados. El catálogo es público: cualquier persona puede verlo.
             </p>
             <div class="mt-4 flex flex-wrap gap-2">
                 <a class="btn accent" href="{{ route('products.create') }}">+ Publicar Nuevo Producto</a>
@@ -44,25 +44,25 @@
         </div>
     @else
         {{--
-            El acceso a publicar se oculta a la bodega sin explicar por que, lo que
-            deja al usuario buscando un boton que el sistema nunca le ofrecio. Se
-            dice explicitamente que la publicacion es exclusiva del mayorista.
+            La publicación es exclusiva del Empresario, pero la Persona Natural
+            no se queda con un callejón sin salida: el sistema le explica cómo
+            habilitar ese rol con la validación de RUC (RN-02).
         --}}
         <div class="card mt-6 border-brand-200 bg-brand-50">
             <h2 class="mt-0 text-lg font-semibold text-brand-900">¿Quieres ofrecer tus productos en Mayoro?</h2>
             <p class="mt-2 text-sm leading-6 text-brand-900">
-                Tu cuenta está registrada como <strong>Bodega</strong>, que es el perfil de quien
-                compra al por mayor. La publicación de productos es exclusiva del perfil
-                <strong>Distribuidor Mayorista</strong>, por eso aquí no aparece la opción de crear
-                un producto.
+                Tu cuenta está registrada como <strong>Persona natural</strong>, el perfil con el que
+                puedes explorar el catálogo, comparar precios por bulto y cotizar con cualquier
+                distribuidor por WhatsApp, sin necesidad de RUC.
             </p>
             <p class="mt-2 text-sm leading-6 text-brand-900">
-                Tu rol actual es <strong>{{ auth()->user()->rol }}</strong>. Puedes explorar el
-                catálogo, comparar precios referenciales y cotizar directamente con cualquier
-                distribuidor por WhatsApp.
+                Para publicar productos y recibir cotizaciones necesitas convertirte en
+                <strong>Empresario</strong>. Es un trámite único: validamos tu RUC con el dígito
+                verificador del Módulo 11 y los datos de tu negocio.
             </p>
             <div class="mt-4 flex flex-wrap gap-2">
-                <a class="btn" href="{{ route('products.index') }}">Explorar el catálogo</a>
+                <a class="btn accent" href="{{ route('profile.empresario') }}">Convertirme en Empresario</a>
+                <a class="btn ghost" href="{{ route('products.index') }}">Explorar el catálogo</a>
                 <a class="btn ghost" href="{{ route('quotes.index') }}">Ver mis cotizaciones</a>
             </div>
         </div>

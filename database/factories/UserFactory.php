@@ -27,39 +27,41 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $ruc = (string) fake()->unique()->numerify('20#########');
         $razonSocial = fake()->company().' S.A.C.';
 
         return [
-            'ruc_empresa' => $ruc,
+            'ruc_empresa' => null,
             'razon_social' => $razonSocial,
+            'rubro' => fake()->randomElement(['Abarrotes', 'Bebidas', 'Limpieza', 'Lácteos']),
             'email_contacto' => Str::slug($razonSocial, '.').'@'.fake()->domainName(),
             'telefono_whatsapp' => '+51'.fake()->numerify('9########'),
             'direccion' => fake()->address(),
             'password' => static::$password ??= Hash::make('password'),
-            'rol' => 'bodega',
+            'rol' => User::ROL_PERSONA_NATURAL,
             'is_premium' => false,
             'remember_token' => Str::random(10),
         ];
     }
 
     /**
-     * Comercio con rol distribuidor mayorista.
+     * RN-02: Empresario validado, el unico rol que publica productos.
      */
-    public function distribuidor(): static
+    public function empresario(): static
     {
         return $this->state(fn (array $attributes) => [
-            'rol' => 'distribuidor',
+            'ruc_empresa' => self::rucValido(),
+            'rol' => User::ROL_EMPRESARIO,
         ]);
     }
 
     /**
-     * Comercio con rol bodega compradora.
+     * RN-01: Persona natural, sin RUC obligatorio.
      */
-    public function bodega(): static
+    public function personaNatural(): static
     {
         return $this->state(fn (array $attributes) => [
-            'rol' => 'bodega',
+            'ruc_empresa' => null,
+            'rol' => User::ROL_PERSONA_NATURAL,
         ]);
     }
 
@@ -71,5 +73,28 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'is_premium' => true,
         ]);
+    }
+
+    /**
+     * Genera un RUC de persona juridica con el digito verificador correcto.
+     */
+    private static function rucValido(): string
+    {
+        $base = '20'.fake()->unique()->numerify('########');
+        $pesos = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+        $suma = 0;
+
+        for ($i = 0; $i < 10; $i++) {
+            $suma += (int) $base[$i] * $pesos[$i];
+        }
+
+        $resto = 11 - ($suma % 11);
+        $digito = match ($resto) {
+            10 => 0,
+            11 => 1,
+            default => $resto,
+        };
+
+        return $base.$digito;
     }
 }

@@ -1,13 +1,12 @@
 {{--
     Ficha CI-COD-13 (HU-03, escenario "Redireccion inteligente al intentar cotizar").
 
-    Modal informativo que la especificacion exige al presionar "Cotizar Pedido"
-    sin sesion: solicita el inicio de sesion y conduce al login conservando el
-    returnUrl para devolver al visitante al producto que estaba mirando.
+    Modal informativo opcional para invitar al visitante a crear cuenta y
+    conservar su historial. Desde RN-01 la cotizacion ya no exige sesion ni RUC:
+    el formulario publico es la via principal y este modal no debe bloquearla.
 
-    No se auto-redirige al abrirse: expulsar al usuario sin que pueda decidir
-    contradice la palabra "informativo" del escenario. El returnUrl viaja en los
-    enlaces del modal, que es donde se cumple la redireccion.
+    No se auto-redirige al abrirse: el visitante decide. El returnUrl viaja en
+    los enlaces del modal, que es donde se cumple la redireccion.
 
     Dos modos de uso:
       - Pagina de detalle, con una sola URL de retorno:
@@ -31,13 +30,13 @@
 <div class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-6" id="authModal" hidden>
     <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="authModalTitulo">
         <h2 id="authModalTitulo" class="mt-0 text-xl font-semibold tracking-tight text-slate-900">
-            Inicia sesión para cotizar
+            Cotiza sin cuenta o guarda tu historial
         </h2>
 
         <p class="mb-5 mt-2 text-sm leading-6 text-slate-600">
-            El catálogo mayorista es público, pero la cotización requiere una cuenta de
-            comercio registrada con RUC y WhatsApp. Te devolvemos al producto que estabas
-            viendo al terminar.
+            El catálogo mayorista es público y cotizar no exige RUC. Si creas una cuenta gratuita
+            como Persona natural, conservas tus cotizaciones y puedes convertirte en Empresario
+            cuando quieras vender. Te devolvemos al producto que estabas viendo.
         </p>
 
         <div class="flex flex-wrap gap-2">
@@ -53,7 +52,7 @@
             </a>
             <a class="btn ghost" data-modal-destino="register" data-modal-base="{{ route('auth.register') }}"
                href="{{ route('auth.register', ['returnUrl' => $rutaInicial]) }}">
-                Crear cuenta de bodega
+                Crear cuenta gratuita
             </a>
             <button class="btn ghost" type="button" data-modal-close>Seguir explorando</button>
         </div>

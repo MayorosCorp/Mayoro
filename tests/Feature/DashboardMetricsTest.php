@@ -34,10 +34,10 @@ class DashboardMetricsTest extends TestCase
     {
         parent::setUp();
 
-        $this->distribuidorA = $this->comercio('20601234567', 'Distribuidora Andina S.A.C.', 'ventas@andina.pe', 'distribuidor');
-        $this->distribuidorB = $this->comercio('20609999999', 'Distribuidora del Sur S.A.C.', 'ventas@sur.pe', 'distribuidor');
-        $this->bodegaA = $this->comercio('10456789012', 'Bodega Don Pepe', 'compras@donpepe.pe', 'bodega');
-        $this->bodegaB = $this->comercio('10456789013', 'Bodega La Esquina', 'compras@esquina.pe', 'bodega');
+        $this->distribuidorA = $this->comercio('20601234565', 'Distribuidora Andina S.A.C.', 'ventas@andina.pe', 'empresario');
+        $this->distribuidorB = $this->comercio('20609999994', 'Distribuidora del Sur S.A.C.', 'ventas@sur.pe', 'empresario');
+        $this->bodegaA = $this->comercio('10456789019', 'Bodega Don Pepe', 'compras@donpepe.pe', 'persona_natural');
+        $this->bodegaB = $this->comercio('10456789027', 'Bodega La Esquina', 'compras@esquina.pe', 'persona_natural');
 
         $this->productoA = $this->producto($this->distribuidorA, 'Producto A');
         $this->productoB = $this->producto($this->distribuidorB, 'Producto B');

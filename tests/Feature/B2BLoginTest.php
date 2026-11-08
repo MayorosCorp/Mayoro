@@ -10,10 +10,10 @@ class B2BLoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function usuario(string $rol = 'bodega'): User
+    private function usuario(string $rol = 'persona_natural'): User
     {
         return User::create([
-            'ruc_empresa' => $rol === 'bodega' ? '10456789012' : '20601234567',
+            'ruc_empresa' => $rol === 'persona_natural' ? '10456789019' : '20601234565',
             'razon_social' => 'Comercio de Prueba E.I.R.L.',
             'email_contacto' => 'contacto@comercio.pe',
             'telefono_whatsapp' => '+51 999 888 777',

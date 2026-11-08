@@ -48,7 +48,7 @@
                     <dd class="m-0 mt-1 font-semibold text-slate-900">{{ $quote->unidades_por_bulto }}</dd>
                 </div>
                 <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                    <dt class="text-xs font-medium uppercase tracking-wide text-slate-500">Bodega solicitante</dt>
+                    <dt class="text-xs font-medium uppercase tracking-wide text-slate-500">Solicitante</dt>
                     <dd class="m-0 mt-1 font-semibold text-slate-900">{{ $quote->bodega->razon_social ?? '-' }}</dd>
                 </div>
                 <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">

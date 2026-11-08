@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="Mayoro conecta bodegas y distribuidores mayoristas del Perú: catálogo con precio por bulto, MOQ y cotización directa por WhatsApp.">
+    <meta name="description" content="Mayoro conecta compradores y distribuidores mayoristas del Perú: catálogo con precio por bulto, MOQ y cotización directa por WhatsApp, sin RUC para explorar.">
     <title>@yield('title', 'Mayoro') &mdash; Mayoro</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -47,9 +47,12 @@
                     <a class="{{ $navBase }} {{ request()->routeIs('quotes.*') ? $navActive : '' }}"
                        href="{{ route('quotes.index') }}">Cotizaciones</a>
 
-                    @if (auth()->user()->rol === 'distribuidor')
+                    @if (auth()->user()->esEmpresario())
                         <a class="ml-1 inline-flex whitespace-nowrap rounded-lg bg-accent-500 px-3 py-1.5 text-sm font-semibold text-brand-950 no-underline transition hover:bg-accent-400"
                            href="{{ route('products.create') }}">+ Publicar Producto</a>
+                    @else
+                        <a class="ml-1 inline-flex whitespace-nowrap rounded-lg bg-accent-500 px-3 py-1.5 text-sm font-semibold text-brand-950 no-underline transition hover:bg-accent-400"
+                           href="{{ route('quotes.create') }}">+ Cotizar</a>
                     @endif
                 @else
                     <a class="{{ $navBase }} {{ request()->routeIs('home') ? $navActive : '' }}"
@@ -58,6 +61,8 @@
                        href="{{ route('products.index') }}">Catálogo</a>
                     <a class="{{ $navBase }} {{ request()->routeIs('suppliers.*') ? $navActive : '' }}"
                        href="{{ route('suppliers.index') }}">Distribuidores</a>
+                    <a class="{{ $navBase }} {{ request()->routeIs('quotes.create') ? $navActive : '' }}"
+                       href="{{ route('quotes.create') }}">Cotizar</a>
                 @endauth
             </nav>
 
@@ -65,7 +70,7 @@
                 @auth
                     <span class="hidden text-right text-xs leading-tight text-brand-100 sm:block">
                         <span class="block font-semibold text-white">{{ auth()->user()->razon_social }}</span>
-                        <span class="capitalize">{{ auth()->user()->rol }}</span>
+                        <span>{{ auth()->user()->rol_etiqueta }}</span>
                     </span>
                     <form method="POST" action="{{ route('auth.logout') }}">
                         @csrf
@@ -114,7 +119,7 @@
     <footer class="mt-8 border-t border-slate-200 bg-white">
         <div class="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <p class="m-0">
-                <span class="font-semibold text-slate-700">Mayoro</span> conecta bodegas y distribuidores mayoristas.
+                <span class="font-semibold text-slate-700">Mayoro</span> conecta compradores y distribuidores mayoristas.
             </p>
             <p class="m-0">
                 La cotización se cierra por WhatsApp. Mayoro no procesa pagos ni envíos.

@@ -48,8 +48,8 @@ class HomeController extends Controller
 
         return [
             'productos' => (int) Product::where('is_active', true)->count(),
-            'distribuidores' => (int) User::where('rol', 'distribuidor')->count(),
-            'bodegas' => (int) User::where('rol', 'bodega')->count(),
+            'distribuidores' => (int) User::where('rol', User::ROL_EMPRESARIO)->count(),
+            'bodegas' => (int) User::where('rol', User::ROL_PERSONA_NATURAL)->count(),
         ];
     }
 }

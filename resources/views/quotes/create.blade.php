@@ -13,8 +13,21 @@
             </p>
         </div>
 
-        <a class="btn ghost shrink-0" href="{{ route('quotes.index') }}">Ver mis cotizaciones</a>
+        @auth
+            <a class="btn ghost shrink-0" href="{{ route('quotes.index') }}">Ver mis cotizaciones</a>
+        @else
+            <a class="btn ghost shrink-0" href="{{ route('auth.register', ['returnUrl' => route('quotes.create')]) }}">
+                Crear cuenta para guardar historial
+            </a>
+        @endauth
     </div>
+
+    @guest
+        <div class="surface-note mt-5" role="status">
+            Estás cotizando como visitante: no pedimos RUC ni cuenta. Al generar la cotización verás el
+            enlace de WhatsApp, pero no quedará guardada en un historial.
+        </div>
+    @endguest
 
     <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
         <section class="card">
@@ -48,7 +61,7 @@
 
                 <div class="mt-6 flex flex-wrap gap-2">
                     <button class="btn" type="submit" data-testid="cotizacion-generar">Generar cotización</button>
-                    <a class="btn ghost" href="{{ route('quotes.index') }}">Cancelar</a>
+                    <a class="btn ghost" href="{{ route('products.index') }}">Cancelar</a>
                 </div>
             </form>
         </section>
@@ -85,7 +98,7 @@
             </dl>
 
             <p class="surface-note mt-4">
-                Mayoro genera el enlace de WhatsApp. El envío del mensaje lo realizas tú desde tu cuenta.
+                Mayoro genera el enlace de WhatsApp. El envío del mensaje lo realizas tú desde tu teléfono.
             </p>
         </aside>
     </div>

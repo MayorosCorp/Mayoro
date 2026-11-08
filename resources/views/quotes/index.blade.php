@@ -13,7 +13,7 @@
             </p>
         </div>
 
-        @if (Auth::user()->rol === 'bodega')
+        @if (Auth::user()->esPersonaNatural())
             <a class="btn shrink-0" href="{{ route('quotes.create') }}" data-testid="cotizaciones-nueva">
                 Nueva cotización
             </a>
@@ -48,7 +48,7 @@
                         <td class="font-semibold text-slate-900">#{{ $quote->id }}</td>
                         <td>{{ $quote->producto->nombre ?? 'Producto eliminado' }}</td>
                         <td>
-                            {{ Auth::user()->rol === 'distribuidor'
+                            {{ Auth::user()->esEmpresario()
                                 ? ($quote->bodega->razon_social ?? '-')
                                 : ($quote->distribuidor->razon_social ?? '-') }}
                         </td>
@@ -66,9 +66,19 @@
                             <div class="py-8 text-center">
                                 <h2 class="mt-0 text-lg font-semibold text-slate-900">Todavía no hay cotizaciones</h2>
                                 <p class="mb-4 mt-1 text-sm text-slate-600">
-                                    Cuando generes una cotización, aparecerá aquí con su desglose y su enlace de WhatsApp.
+                                    @if (Auth::user()->esEmpresario())
+                                        Cuando un comprador genere una cotización de tus productos, aparecerá aquí
+                                        con su desglose y el enlace de WhatsApp.
+                                    @else
+                                        Cuando generes una cotización, aparecerá aquí con su desglose y su enlace de
+                                        WhatsApp.
+                                    @endif
                                 </p>
-                                <a class="btn" href="{{ route('products.index') }}">Explorar el catálogo</a>
+                                @if (Auth::user()->esPersonaNatural())
+                                    <a class="btn" href="{{ route('quotes.create') }}">Nueva cotización</a>
+                                @else
+                                    <a class="btn" href="{{ route('products.index') }}">Ver el catálogo</a>
+                                @endif
                             </div>
                         </td>
                     </tr>

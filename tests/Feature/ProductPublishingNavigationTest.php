@@ -26,11 +26,11 @@ class ProductPublishingNavigationTest extends TestCase
         parent::setUp();
 
         $this->distribuidor = User::create([
-            'ruc_empresa' => '20601234567',
+            'ruc_empresa' => '20601234565',
             'razon_social' => 'Distribuidora Andina S.A.C.',
             'email_contacto' => 'ventas@andina.pe',
             'telefono_whatsapp' => '+51 987654321',
-            'rol' => 'distribuidor',
+            'rol' => 'empresario',
             'password' => bcrypt('password'),
         ]);
 
@@ -39,7 +39,7 @@ class ProductPublishingNavigationTest extends TestCase
             'razon_social' => 'Bodega El Comercio E.I.R.L.',
             'email_contacto' => 'compras@comercio.pe',
             'telefono_whatsapp' => '+51 912345678',
-            'rol' => 'bodega',
+            'rol' => 'persona_natural',
             'password' => bcrypt('password'),
         ]);
     }
@@ -247,39 +247,40 @@ class ProductPublishingNavigationTest extends TestCase
 
     /**
      * Ocultar el acceso sin explicar la causa deja al usuario buscando un botón
-     * que el sistema nunca le ofreció. El bodeguero debe leer el motivo.
+     * que el sistema nunca le ofreció. La Persona natural debe leer el motivo y
+     * la vía de conversión a Empresario.
      */
 
-    // php artisan test --filter=test_el_rol_bodega_recibe_explicacion_del_bloqueo_de_publicacion
-    public function test_el_rol_bodega_recibe_explicacion_del_bloqueo_de_publicacion(): void
+    // php artisan test --filter=test_la_persona_natural_recibe_explicacion_y_cta_de_conversion
+    public function test_la_persona_natural_recibe_explicacion_y_cta_de_conversion(): void
     {
-        // Given: un usuario con rol bodega y sesión iniciada
+        // Given: una Persona natural con sesión iniciada
         $this->actingAs($this->bodega)
             // When: abre el dashboard
             ->get(route('dashboard.index'))
-            // Then: lee el motivo del bloqueo junto a su rol actual
+            // Then: lee su rol actual, el motivo y el CTA de conversión
             ->assertOk()
-            ->assertSee('exclusiva del perfil', escape: false)
-            ->assertSee('Distribuidor Mayorista', escape: false)
-            ->assertSee('Tu rol actual es', escape: false)
-            ->assertSee('bodega', escape: false);
+            ->assertSee('Persona natural', escape: false)
+            ->assertSee('Convertirme en Empresario', escape: false)
+            ->assertSee(route('profile.empresario'), escape: false)
+            ->assertSee('Módulo 11', escape: false);
     }
 
     /**
-     * El distribuidor no debe recibir el aviso de bloqueo: para él sí existe el
-     * acceso, y el texto lo confundiria.
+     * El Empresario no debe recibir el aviso de conversión: para él sí existe el
+     * acceso, y el texto lo confundiría.
      */
 
-    // php artisan test --filter=test_el_distribuidor_no_recibe_el_aviso_de_bloqueo
-    public function test_el_distribuidor_no_recibe_el_aviso_de_bloqueo(): void
+    // php artisan test --filter=test_el_empresario_no_recibe_el_aviso_de_conversion
+    public function test_el_empresario_no_recibe_el_aviso_de_conversion(): void
     {
-        // Given: un distribuidor con sesión iniciada
+        // Given: un Empresario con sesión iniciada
         $this->actingAs($this->distribuidor)
             // When: abre el dashboard
             ->get(route('dashboard.index'))
-            // Then: no recibe el aviso de bloqueo reservado al bodeguero
+            // Then: no recibe el aviso de conversión reservado a la Persona natural
             ->assertOk()
-            ->assertDontSee('exclusiva del perfil', escape: false);
+            ->assertDontSee('Convertirme en Empresario', escape: false);
     }
 
     /**

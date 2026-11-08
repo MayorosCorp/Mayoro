@@ -18,11 +18,11 @@ class PublicCatalogTest extends TestCase
         parent::setUp();
 
         $this->distribuidor = User::create([
-            'ruc_empresa' => '20601234567',
+            'ruc_empresa' => '20601234565',
             'razon_social' => 'Distribuidora Central S.A.C.',
             'email_contacto' => 'ventas@central.pe',
             'telefono_whatsapp' => '+51 987 654 321',
-            'rol' => 'distribuidor',
+            'rol' => 'empresario',
             'password' => bcrypt('password123'),
         ]);
     }
@@ -280,29 +280,23 @@ class PublicCatalogTest extends TestCase
     }
 
     /**
-     * HU-03: Redirección inteligente, el visitante recibe el returnUrl para
-     * volver al producto que estaba consultando.
+     * RN-01: el visitante cotiza sin pasar por el login. El returnUrl sigue
+     * existiendo para quien decide crear cuenta, pero ya no es el camino
+     * obligatorio para generar la cotización.
      */
 
-    // php artisan test --filter=test_el_visitante_es_redirigido_al_login_conservando_el_return_url
-    public function test_el_visitante_es_redirigido_al_login_conservando_el_return_url(): void
+    // php artisan test --filter=test_el_visitante_cotiza_sin_pasar_por_el_login
+    public function test_el_visitante_cotiza_sin_pasar_por_el_login(): void
     {
         // Given: un producto publicado en el catálogo
         $producto = $this->producto();
 
-        // When: el visitante abre el login indicando la vuelta a ese producto
-        $response = $this->get(route('auth.login', ['returnUrl' => route('products.show', $producto->id)]));
-
-        // Then: el login muestra el mensaje de continuación y registra la returnUrl
-        $response->assertOk();
-        $response->assertSee('Inicia sesión para continuar con tu cotización');
-        // La URL absoluta propia del dominio se normaliza a su ruta relativa
-        $this->assertSame('/products/'.$producto->id, session('url.intended'));
-
         // When: el visitante abre el detalle del producto
-        // Then: el enlace de cotizar conduce al login con esa returnUrl
+        // Then: el enlace de cotizar conduce al formulario público, no al login
         $this->get(route('products.show', $producto->id))
-            ->assertSee(route('auth.login', ['returnUrl' => route('products.show', $producto->id)]), escape: false);
+            ->assertOk()
+            ->assertSee(route('quotes.create', ['producto' => $producto->id]), escape: false)
+            ->assertDontSee(route('auth.login', ['returnUrl' => route('products.show', $producto->id)]), escape: false);
     }
 
     /**
@@ -317,11 +311,11 @@ class PublicCatalogTest extends TestCase
         $producto = $this->producto();
 
         $bodega = User::create([
-            'ruc_empresa' => '10456789012',
+            'ruc_empresa' => '10456789019',
             'razon_social' => 'Bodega Don Pepe',
             'email_contacto' => 'compras@donpepe.pe',
             'telefono_whatsapp' => '+51 999 888 777',
-            'rol' => 'bodega',
+            'rol' => 'persona_natural',
             'password' => bcrypt('secreto123'),
         ]);
 
@@ -378,11 +372,11 @@ class PublicCatalogTest extends TestCase
     {
         // Given: un usuario autenticado con rol bodega
         $bodega = User::create([
-            'ruc_empresa' => '10456789012',
+            'ruc_empresa' => '10456789019',
             'razon_social' => 'Bodega Don Pepe',
             'email_contacto' => 'compras@donpepe.pe',
             'telefono_whatsapp' => '+51 999 888 777',
-            'rol' => 'bodega',
+            'rol' => 'persona_natural',
             'password' => bcrypt('password123'),
         ]);
 

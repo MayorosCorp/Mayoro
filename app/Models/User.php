@@ -14,6 +14,10 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    public const ROL_PERSONA_NATURAL = 'persona_natural';
+
+    public const ROL_EMPRESARIO = 'empresario';
+
     protected $table = 'usuarios_b2b';
 
     /**
@@ -24,6 +28,7 @@ class User extends Authenticatable
     protected $fillable = [
         'ruc_empresa',
         'razon_social',
+        'rubro',
         'email_contacto',
         'telefono_whatsapp',
         'direccion',
@@ -35,6 +40,30 @@ class User extends Authenticatable
     public function getNameAttribute(): string
     {
         return $this->razon_social ?? '';
+    }
+
+    /**
+     * RN-02: solo el Empresario validado puede publicar y tener micrositio.
+     */
+    public function esEmpresario(): bool
+    {
+        return $this->rol === self::ROL_EMPRESARIO;
+    }
+
+    /**
+     * RN-01: el rol inicial, que puede navegar y cotizar sin RUC.
+     */
+    public function esPersonaNatural(): bool
+    {
+        return $this->rol === self::ROL_PERSONA_NATURAL;
+    }
+
+    /**
+     * Etiqueta visible del rol, sin exponer el valor tecnico en la interfaz.
+     */
+    public function getRolEtiquetaAttribute(): string
+    {
+        return $this->esEmpresario() ? 'Empresario' : 'Persona natural';
     }
 
     public function getEmailAttribute(): string

@@ -24,7 +24,7 @@ class ProductFactory extends Factory
         $precioBulto = fake()->randomFloat(2, 15, 500);
 
         return [
-            'distribuidor_id' => User::factory()->distribuidor(),
+            'distribuidor_id' => User::factory()->empresario(),
             'nombre' => fake()->unique()->words(3, true),
             'descripcion' => fake()->sentence(8),
             'categoria' => fake()->randomElement(['Abarrotes', 'Lácteos', 'Bebidas', 'Golosinas', 'Limpieza']),
