@@ -39,7 +39,7 @@ class QuoteController extends Controller
     {
         // Solo se ofrece lo que el servidor aceptaria: producto publicado y con
         // stock suficiente para cubrir su propio MOQ (RN-05).
-        $productos = Product::with('distribuidor')
+        $productos = Product::with(['distribuidor', 'tramosPrecio'])
             ->where('is_active', true)
             ->where('stock_disponible', '>=', 1)
             ->whereColumn('stock_disponible', '>=', 'moq_cantidad_minima')
@@ -64,7 +64,7 @@ class QuoteController extends Controller
      */
     public function store(StoreQuoteRequest $request): RedirectResponse
     {
-        $producto = Product::with('distribuidor')->findOrFail($request->integer('producto_id'));
+        $producto = Product::with(['distribuidor', 'tramosPrecio'])->findOrFail($request->integer('producto_id'));
         $cantidad = (int) $request->integer('cantidad_solicitada');
 
         // Blindaje adicional ante una carrera entre la validacion y el guardado:
@@ -77,11 +77,13 @@ class QuoteController extends Controller
                 ]);
         }
 
-        $precioBulto = (float) $producto->precio_bulto;
+        $precio = $this->quotation->resolverPrecioBulto($producto, $cantidad);
+        $precioBulto = $precio['precio_bulto'];
+        $tramoDesde = $precio['tramo_cantidad_minima'];
         $totales = $this->quotation->calcularTotales($precioBulto, $cantidad);
         $telefono = (string) $producto->distribuidor?->telefono_whatsapp;
         $solicitante = $request->user();
-        $mensaje = $this->quotation->resumirCotizacion($solicitante, $producto, $cantidad);
+        $mensaje = $this->quotation->resumirCotizacion($solicitante, $producto, $cantidad, $precioBulto, $tramoDesde);
 
         $urlWhatsapp = $this->esTelefonoUtilizable($telefono)
             ? $this->quotation->generateWhatsAppLink($telefono, $mensaje)
@@ -93,6 +95,7 @@ class QuoteController extends Controller
                 'cantidad_solicitada' => $cantidad,
                 'precio_bulto' => $precioBulto,
                 'unidades_por_bulto' => $producto->unidades_por_bulto,
+                'tramo_cantidad_minima' => $tramoDesde,
                 'subtotal' => $totales['subtotal'],
                 'igv' => $totales['igv'],
                 'total' => $totales['total'],
@@ -113,7 +116,8 @@ class QuoteController extends Controller
             // condiciones vigentes al generarla.
             'precio_bulto' => $precioBulto,
             'unidades_por_bulto' => $producto->unidades_por_bulto,
-            'precio_unitario' => $producto->precio_unitario_calculado,
+            'tramo_cantidad_minima' => $tramoDesde,
+            'precio_unitario' => round($precioBulto / max(1, (int) $producto->unidades_por_bulto), 2),
             'subtotal' => $totales['subtotal'],
             'igv' => $totales['igv'],
             'total' => $totales['total'],

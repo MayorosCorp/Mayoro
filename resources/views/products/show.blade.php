@@ -90,6 +90,63 @@
                 </dl>
             </section>
 
+            @if ($product->tramosPrecio->isNotEmpty())
+                <section class="card" data-testid="producto-tramos">
+                    <h2 class="mt-0 text-base font-semibold text-slate-900">Precios por volumen</h2>
+                    <p class="mt-1 text-sm leading-6 text-slate-600">
+                        El distribuidor aplica un solo tramo por cotización: el de mayor umbral
+                        que no supere la cantidad pedida. Los precios son por bulto y sin IGV.
+                    </p>
+
+                    <div class="mt-3 overflow-x-auto">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Cantidad de bultos</th>
+                                    <th scope="col">Precio por bulto</th>
+                                    <th scope="col">Unitario ref.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                    $unidades = max(1, (int) $product->unidades_por_bulto);
+                                    $tramos = $product->tramosPrecio->values();
+                                    $primerTramo = $tramos->first();
+                                @endphp
+
+                                <tr data-testid="tramo-base">
+                                    <td>
+                                        {{ $product->moq_cantidad_minima }} a {{ $primerTramo->cantidad_minima - 1 }}
+                                        <span class="block text-xs text-slate-500">Precio base</span>
+                                    </td>
+                                    <td class="font-semibold text-slate-900">
+                                        S/ {{ number_format((float) $product->precio_bulto, 2) }}
+                                    </td>
+                                    <td>S/ {{ number_format($product->precio_unitario_calculado, 2) }}</td>
+                                </tr>
+
+                                @foreach ($tramos as $indice => $tramo)
+                                    @php $siguiente = $tramos->get($indice + 1); @endphp
+                                    <tr data-testid="tramo-precio">
+                                        <td>
+                                            @if ($siguiente)
+                                                {{ $tramo->cantidad_minima }} a {{ $siguiente->cantidad_minima - 1 }}
+                                            @else
+                                                Desde {{ $tramo->cantidad_minima }}
+                                            @endif
+                                        </td>
+                                        <td class="font-semibold text-slate-900">
+                                            S/ {{ number_format((float) $tramo->precio_bulto, 2) }}
+                                        </td>
+                                        <td>S/ {{ number_format((float) $tramo->precio_bulto / $unidades, 2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            @endif
+
             <section class="card" data-testid="producto-desglose">
                 <h2 class="mt-0 text-base font-semibold text-slate-900">Desglose por bulto</h2>
                 <dl class="mt-3 space-y-2 text-sm">

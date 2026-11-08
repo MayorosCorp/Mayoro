@@ -106,6 +106,10 @@
 
             <hr class="my-6 border-slate-200">
 
+            @include('products._tramos')
+
+            <hr class="my-6 border-slate-200">
+
             <fieldset class="m-0 border-0 p-0">
                 <legend class="text-base font-semibold text-slate-900">Disponibilidad</legend>
 

@@ -101,6 +101,15 @@
 
             <hr class="my-6 border-slate-200">
 
+            @include('products._tramos', [
+                'tramos' => $product->tramosPrecio->map(fn ($tramo): array => [
+                    'cantidad_minima' => $tramo->cantidad_minima,
+                    'precio_bulto' => $tramo->precio_bulto,
+                ])->all(),
+            ])
+
+            <hr class="my-6 border-slate-200">
+
             <fieldset class="m-0 border-0 p-0">
                 <legend class="text-base font-semibold text-slate-900">Imagen</legend>
 

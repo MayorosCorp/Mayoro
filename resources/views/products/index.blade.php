@@ -102,6 +102,13 @@
                             IGV 18%: S/ {{ number_format((float) $prod->precio_bulto * 0.18, 2) }}
                             &middot; total S/ {{ number_format((float) $prod->precio_bulto * 1.18, 2) }}
                         </p>
+                        @if ($prod->tramosPrecio->isNotEmpty())
+                            @php $mejorTramo = $prod->tramosPrecio->last(); @endphp
+                            <p class="m-0 text-xs font-semibold text-emerald-700" data-testid="producto-tramo">
+                                Desde {{ $mejorTramo->cantidad_minima }} bultos:
+                                S/ {{ number_format((float) $mejorTramo->precio_bulto, 2) }} / bulto
+                            </p>
+                        @endif
                     </div>
 
                     <div class="flex flex-wrap gap-1.5">

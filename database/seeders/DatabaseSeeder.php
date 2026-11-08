@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Product;
+use App\Models\ProductPriceTier;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -62,6 +63,10 @@ class DatabaseSeeder extends Seeder
                 'precio_bulto' => 78.00,
                 'moq_cantidad_minima' => 20,
                 'stock_disponible' => 320,
+                'tramos' => [
+                    ['cantidad_minima' => 50, 'precio_bulto' => 74.00],
+                    ['cantidad_minima' => 100, 'precio_bulto' => 70.00],
+                ],
             ],
             [
                 'nombre' => 'Gaseosa Cola 1.5 L',
@@ -82,6 +87,10 @@ class DatabaseSeeder extends Seeder
                 'precio_bulto' => 156.00,
                 'moq_cantidad_minima' => 10,
                 'stock_disponible' => 145,
+                'tramos' => [
+                    ['cantidad_minima' => 25, 'precio_bulto' => 149.00],
+                    ['cantidad_minima' => 60, 'precio_bulto' => 142.00],
+                ],
             ],
             [
                 'nombre' => 'Arroz Pilado Superior 5 kg',
@@ -92,6 +101,10 @@ class DatabaseSeeder extends Seeder
                 'precio_bulto' => 92.00,
                 'moq_cantidad_minima' => 15,
                 'stock_disponible' => 210,
+                'tramos' => [
+                    ['cantidad_minima' => 40, 'precio_bulto' => 88.00],
+                    ['cantidad_minima' => 80, 'precio_bulto' => 84.00],
+                ],
             ],
             [
                 'nombre' => 'Azúcar Rubia 1 kg',
@@ -138,7 +151,7 @@ class DatabaseSeeder extends Seeder
         foreach ($productos as $producto) {
             $unidades = $producto['unidades_por_bulto'];
 
-            Product::query()->updateOrCreate(
+            $modelo = Product::query()->updateOrCreate(
                 [
                     'distribuidor_id' => $distribuidor->id,
                     'nombre' => $producto['nombre'],
@@ -156,6 +169,14 @@ class DatabaseSeeder extends Seeder
                     'is_active' => true,
                 ]
             );
+
+            // RN-04: datos demo de tramos. Se reemplazan en cada siembra para
+            // que el ejemplo sea reproducible.
+            ProductPriceTier::query()->where('producto_id', $modelo->id)->delete();
+
+            foreach ($producto['tramos'] ?? [] as $tramo) {
+                $modelo->tramosPrecio()->create($tramo);
+            }
         }
 
         $this->command?->info('Cuentas demo: 2 (1 Empresario, 1 Persona natural).');

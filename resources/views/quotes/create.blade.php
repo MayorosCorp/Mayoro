@@ -44,6 +44,7 @@
                                 data-precio-bulto="{{ $producto->precio_bulto }}"
                                 data-unidades="{{ $producto->unidades_por_bulto }}"
                                 data-stock="{{ $producto->stock_disponible }}"
+                                data-tramos='@json($producto->tramosPrecio->map(fn ($tramo): array => ["cantidad_minima" => $tramo->cantidad_minima, "precio_bulto" => (float) $tramo->precio_bulto])->values())'
                                 @selected(old('producto_id', $seleccionado?->id) == $producto->id)>
                             {{ $producto->nombre }} — {{ $producto->presentacion }}
                             (MOQ {{ $producto->moq_cantidad_minima }} bultos)
@@ -79,6 +80,7 @@
                     <dt class="text-slate-600">Precio por bulto</dt>
                     <dd class="m-0 font-semibold text-slate-900" id="resumen-precio">—</dd>
                 </div>
+                <p class="m-0 text-xs font-medium text-emerald-700" id="resumen-tramo" data-testid="cotizacion-tramo-preview" hidden></p>
                 <div class="flex items-center justify-between gap-4">
                     <dt class="text-slate-600">Bultos</dt>
                     <dd class="m-0 font-semibold text-slate-900" id="resumen-bultos">—</dd>
@@ -111,6 +113,7 @@
             var stockHint = document.getElementById('stock-hint');
             var resumenProducto = document.getElementById('resumen-producto');
             var resumenPrecio = document.getElementById('resumen-precio');
+            var resumenTramo = document.getElementById('resumen-tramo');
             var resumenBultos = document.getElementById('resumen-bultos');
             var resumenSubtotal = document.getElementById('resumen-subtotal');
             var resumenIgv = document.getElementById('resumen-igv');
@@ -135,6 +138,7 @@
                     stockHint.textContent = 'El servidor valida el MOQ y el stock antes de registrar la cotización.';
                     resumenProducto.textContent = 'Selecciona un producto para ver el resumen.';
                     resumenPrecio.textContent = '—';
+                    resumenTramo.hidden = true;
                     resumenBultos.textContent = '—';
                     resumenSubtotal.textContent = '—';
                     resumenIgv.textContent = '—';
@@ -156,11 +160,47 @@
                 }
 
                 var bultos = parseInt(cantidad.value || '0', 10);
-                var subtotal = precio * bultos;
+                var tramos = [];
+
+                try {
+                    tramos = JSON.parse(opcion.dataset.tramos || '[]');
+                } catch (error) {
+                    tramos = [];
+                }
+
+                // RN-04: un solo tramo, el de mayor umbral que no supere la
+                // cantidad. El servidor repite esta misma seleccion al guardar.
+                var tramoAplicado = null;
+                var siguienteTramo = null;
+
+                tramos.forEach(function (tramo) {
+                    var umbral = Number(tramo.cantidad_minima);
+
+                    if (umbral <= bultos && (tramoAplicado === null || umbral > Number(tramoAplicado.cantidad_minima))) {
+                        tramoAplicado = tramo;
+                    }
+
+                    if (umbral > bultos && (siguienteTramo === null || umbral < Number(siguienteTramo.cantidad_minima))) {
+                        siguienteTramo = tramo;
+                    }
+                });
+
+                var precioAplicable = tramoAplicado ? Number(tramoAplicado.precio_bulto) : precio;
+                var subtotal = precioAplicable * bultos;
                 var igv = subtotal * 0.18;
 
+                if (tramoAplicado) {
+                    resumenTramo.textContent = 'Precio por volumen aplicado desde ' + tramoAplicado.cantidad_minima + ' bultos.';
+                    resumenTramo.hidden = false;
+                } else if (siguienteTramo) {
+                    resumenTramo.textContent = 'Desde ' + siguienteTramo.cantidad_minima + ' bultos el precio baja a ' + soles(Number(siguienteTramo.precio_bulto)) + ' por bulto.';
+                    resumenTramo.hidden = false;
+                } else {
+                    resumenTramo.hidden = true;
+                }
+
                 resumenProducto.textContent = opcion.dataset.nombre || '';
-                resumenPrecio.textContent = soles(precio);
+                resumenPrecio.textContent = soles(precioAplicable);
                 resumenBultos.textContent = bultos;
                 resumenSubtotal.textContent = soles(subtotal);
                 resumenIgv.textContent = soles(igv);
