@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SupplierController;
@@ -27,8 +28,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     Route::prefix('products')->name('products.')->group(function () {
-        // RBAC: Solo distribuidores mayoristas pueden crear, almacenar o modificar productos
-        Route::middleware('role:distribuidor')->group(function () {
+        // RN-02 / RN-03: solo el Empresario validado publica y administra productos.
+        Route::middleware('role:empresario')->group(function () {
             Route::get('/create', [ProductController::class, 'create'])->name('create');
             Route::post('/', [ProductController::class, 'store'])->name('store');
             Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit');
@@ -40,9 +41,12 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('quotes')->name('quotes.')->group(function () {
         Route::get('/', [QuoteController::class, 'index'])->name('index');
-        Route::get('/create', [QuoteController::class, 'create'])->name('create');
-        Route::post('/', [QuoteController::class, 'store'])->name('store');
-        Route::get('/{quote}', [QuoteController::class, 'show'])->name('show');
+        Route::get('/{quote}', [QuoteController::class, 'show'])->name('show')->whereNumber('quote');
+    });
+
+    Route::prefix('perfil')->name('profile.')->group(function () {
+        Route::get('/empresario', [ProfileController::class, 'showEmpresarioForm'])->name('empresario');
+        Route::post('/empresario', [ProfileController::class, 'convertirEnEmpresario'])->name('empresario.convertir');
     });
 
     Route::prefix('orders')->name('orders.')->group(function () {
@@ -91,4 +95,19 @@ Route::prefix('products')->name('products.')->group(function () {
 Route::prefix('proveedores')->name('suppliers.')->group(function () {
     Route::get('/', [SupplierController::class, 'index'])->name('index');
     Route::get('/{supplier}', [SupplierController::class, 'show'])->name('show')->whereNumber('supplier');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Cotizacion publica (HU-04 + RN-01 / RN-05)
+|--------------------------------------------------------------------------
+| Un visitante sin cuenta puede armar y generar su enlace de WhatsApp: Mayoro
+| no le exige RUC para cotizar. La solicitud del visitante no se persiste; solo
+| la Persona Natural autenticada conserva historial en cotizaciones_b2b.
+| El limite de peticiones evita usar el formulario publico como vector de abuso.
+*/
+Route::prefix('quotes')->name('quotes.')->group(function () {
+    Route::get('/create', [QuoteController::class, 'create'])->name('create');
+    Route::post('/', [QuoteController::class, 'store'])->name('store')->middleware('throttle:20,1');
+    Route::get('/efimera', [QuoteController::class, 'efimera'])->name('efimera');
 });

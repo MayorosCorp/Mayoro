@@ -19,7 +19,7 @@ class CheckRole
         $user = $request->user();
 
         if (! $user || ! in_array($user->rol, $roles, true)) {
-            abort(403, 'Acceso denegado: Solo distribuidores mayoristas pueden gestionar productos.');
+            abort(403, 'Acceso denegado: esta sección requiere el rol Empresario validado.');
         }
 
         return $next($request);
