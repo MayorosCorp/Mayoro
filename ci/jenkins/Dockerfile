@@ -15,6 +15,7 @@ RUN apt-get update \
         curl \
         git \
         unzip \
+        xz-utils \
         php8.4-cli \
         php8.4-curl \
         php8.4-mbstring \
