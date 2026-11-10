@@ -23,8 +23,10 @@ RUN apt-get update \
         php8.4-sqlite3 \
         php8.4-xml \
         php8.4-zip \
-        docker.io \
     && rm -rf /var/lib/apt/lists/*
+
+# Docker CLI (solo cliente: habla con el daemon del host por el socket)
+COPY --from=docker:cli /usr/local/bin/docker /usr/local/bin/docker
 
 # Node.js 22 LTS (Vite 7 requiere Node >= 20.19)
 ARG NODE_VERSION=22.14.0
