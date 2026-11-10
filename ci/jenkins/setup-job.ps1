@@ -65,7 +65,11 @@ $jobXml = @"
     <scriptPath>Jenkinsfile</scriptPath>
     <lightweight>true</lightweight>
   </definition>
-  <triggers/>
+  <triggers>
+    <hudson.triggers.SCMTrigger>
+      <spec>H/5 * * * *</spec>
+    </hudson.triggers.SCMTrigger>
+  </triggers>
   <disabled>false</disabled>
 </flow-definition>
 "@
