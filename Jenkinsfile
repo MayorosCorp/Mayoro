@@ -11,7 +11,7 @@
  *   6. Despliegue local (contenedor mayoro-app en http://localhost:8000)
  *   7. Verificación de salud
  *
- * Ramas (Gitflow): este job sigue */develop (integración continua).
+ * Ramas (Gitflow): este job sigue la rama develop (integración continua).
  */
 pipeline {
     agent any

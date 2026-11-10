@@ -18,6 +18,11 @@ services:
     container_name: mayoro-jenkins
     user: root
     restart: unless-stopped
+    environment:
+      # Arranca listo para usar (sin asistente de primera ejecución).
+      # Acceso abierto en localhost; en un servidor real configura
+      # Manage Jenkins → Security antes de exponerlo.
+      JAVA_OPTS: -Djenkins.install.runSetupWizard=false
     ports:
       - "8080:8080"   # UI de Jenkins
       - "50000:50000" # Puerto de agentes (reservado, no se usa en local)

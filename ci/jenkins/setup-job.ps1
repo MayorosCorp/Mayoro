@@ -80,13 +80,13 @@ try {
 
 if ($exists) {
     Invoke-RestMethod -Method Post -Uri "$JenkinsUrl/job/$JobName/config.xml" `
-        -Headers $headers -WebSession $session -ContentType "application/xml" `
-        -Body $jobXml | Out-Null
+        -Headers $headers -WebSession $session -ContentType "application/xml; charset=UTF-8" `
+        -Body ([Text.Encoding]::UTF8.GetBytes($jobXml)) | Out-Null
     Write-Host "Job '$JobName' actualizado."
 } else {
     Invoke-RestMethod -Method Post -Uri "$JenkinsUrl/createItem?name=$JobName" `
-        -Headers $headers -WebSession $session -ContentType "application/xml" `
-        -Body $jobXml | Out-Null
+        -Headers $headers -WebSession $session -ContentType "application/xml; charset=UTF-8" `
+        -Body ([Text.Encoding]::UTF8.GetBytes($jobXml)) | Out-Null
     Write-Host "Job '$JobName' creado."
 }
 
