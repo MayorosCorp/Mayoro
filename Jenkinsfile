@@ -10,6 +10,7 @@
  *   5. Imagen Docker de la aplicación
  *   6. Despliegue local (contenedor mayoro-app en http://localhost:8000)
  *   7. Verificación de salud
+ *   8. Tests E2E de humo (Cypress + Xvfb contra el contenedor desplegado)
  *
  * Ramas (Gitflow): este job sigue la rama develop (integración continua).
  */
@@ -57,7 +58,7 @@ pipeline {
 
         stage('Tests (PHPUnit)') {
             steps {
-                sh 'mkdir -p reports'
+                sh 'rm -rf reports && mkdir -p reports'
                 sh 'vendor/bin/phpunit --log-junit reports/junit.xml'
             }
         }
@@ -115,11 +116,25 @@ pipeline {
                 '''
             }
         }
+
+        stage('E2E (Cypress)') {
+            steps {
+                sh '''
+                    # Cypress corre en Electron headless: necesita un display virtual.
+                    # baseUrl apunta al contenedor recién desplegado (misma red Docker).
+                    mkdir -p reports
+                    CYPRESS_baseUrl=http://mayoro-app:8080 xvfb-run -a \
+                        npx cypress run \
+                        --reporter junit \
+                        --reporter-options mochaFile=reports/cypress-junit.xml
+                '''
+            }
+        }
     }
 
     post {
         always {
-            junit allowEmptyResults: true, testResults: 'reports/junit.xml'
+            junit allowEmptyResults: true, testResults: 'reports/*.xml'
         }
         success {
             echo "OK: build #$BUILD_NUMBER desplegado en http://localhost:8000"

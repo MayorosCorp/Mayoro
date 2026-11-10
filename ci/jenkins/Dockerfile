@@ -1,6 +1,7 @@
 # Jenkins LTS con el toolchain de Mayoro:
-#   - PHP 8.3 + Composer  → backend Laravel y tests
-#   - Node 22             → build de Vite
+#   - PHP 8.4 + Composer  → backend Laravel y tests
+#   - Node 22             → build de Vite y Cypress
+#   - Cypress + Xvfb      → tests E2E en modo headless
 #   - Docker CLI          → construir la imagen y desplegar la app
 #     (habla con el daemon Docker del host vía /var/run/docker.sock,
 #      patrón "docker brotherhood": lanza contenedores hermanos)
@@ -23,6 +24,33 @@ RUN apt-get update \
         php8.4-sqlite3 \
         php8.4-xml \
         php8.4-zip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Dependencias de sistema de Cypress/Electron + Xvfb para correr E2E sin pantalla.
+# Debian 13 (trixie) renombra varias librerías con el sufijo t64.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        fonts-liberation \
+        libasound2t64 \
+        libatk-bridge2.0-0t64 \
+        libatspi2.0-0t64 \
+        libcups2t64 \
+        libdrm2 \
+        libgbm1 \
+        libgtk-3-0t64 \
+        libnotify4 \
+        libnss3 \
+        libx11-xcb1 \
+        libxcb-dri3-0 \
+        libxcomposite1 \
+        libxdamage1 \
+        libxkbcommon0 \
+        libxrandr2 \
+        libxshmfence1 \
+        libxss1 \
+        libxtst6 \
+        xauth \
+        xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 # Docker CLI (solo cliente: habla con el daemon del host por el socket)

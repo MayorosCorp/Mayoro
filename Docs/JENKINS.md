@@ -12,7 +12,7 @@ GitHub (MayorosCorp/Mayoro, rama develop)
 ┌─────────────────────────────┐        ┌──────────────────────────────┐
 │ mayoro-jenkins (contenedor) │        │ mayoro-app (contenedor)      │
 │  PHP 8.4 + Composer         │ docker │  Imagen mayoro/app:<build>   │
-│  Node 22 + Vite             │───────▶│  http://localhost:8000       │
+│  Node 22 + Vite + Cypress   │───────▶│  http://localhost:8000       │
 │  Docker CLI (socket host)   │        │  Volumen mayoro_storage      │
 └─────────────────────────────┘        └──────────────────────────────┘
 ```
@@ -78,8 +78,30 @@ en <http://localhost:8000>.
 | Imagen | `docker build -f ci/app/Dockerfile` | imagen de producción reproducible |
 | Despliegue | `docker run mayoro-app` | contenedor nuevo en `localhost:8000` |
 | Salud | `curl http://mayoro-app:8080` | la app responde HTTP 200 |
+| E2E | `xvfb-run npx cypress run` | login, dashboard, catálogo y directorio contra el contenedor desplegado |
 
-El reporte de pruebas aparece en la pestaña **Test Result** de cada build.
+El reporte de pruebas aparece en la pestaña **Test Result** de cada build
+(PHPUnit y Cypress se publican juntos desde `reports/*.xml`).
+
+### Tests E2E (Cypress)
+
+Los tests de humo viven en `cypress/e2e/smoke.cy.js` y cubren portada,
+catálogo, directorio, login válido/inválido y acceso al dashboard. Usan
+`data-testid` para no depender de las clases de Tailwind.
+
+```bash
+# Local (con la app levantada en http://localhost:8000)
+npm run test:e2e        # modo headless
+npm run cypress:open    # modo interactivo
+
+# Contra otro destino
+CYPRESS_baseUrl=http://localhost:8000 npm run test:e2e
+```
+
+En Jenkins la etapa **E2E (Cypress)** corre después de la verificación de salud,
+apunta al contenedor desplegado (`http://mayoro-app:8080`) y usa `xvfb-run`
+porque el agente no tiene pantalla. El reporte JUnit queda en
+`reports/cypress-junit.xml`.
 
 ## Flujo de trabajo diario
 
@@ -137,6 +159,8 @@ docker volume rm mayoro_storage
 | La app responde 500 y el log dice "Unsupported cipher" | `APP_KEY` inválida; borra `jenkins_home/mayoro-deploy.env` y vuelve a desplegar |
 | Primer build muy lento | Normal: descarga dependencias de Composer/npm por primera vez |
 | Cambios en `ci/jenkins/Dockerfile` no aplican | `docker compose up -d --build` |
+| Cypress falla con `libX... not found` o `Xvfb` | Reconstruye la imagen de Jenkins: incluye las libs de Electron y `xvfb` |
+| Cypress falla solo en CI con `ECONNREFUSED` | La app debe estar sana en `mayoro-app:8080` (misma red `mayoro_default`) |
 
 ## Hacia un entorno de producción real
 

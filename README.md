@@ -151,13 +151,14 @@ docs(readme): add project setup and commit convention guidelines
 php artisan route:list       # Listar rutas registradas
 php artisan view:cache       # Compilar todas las vistas Blade
 php artisan test             # Ejecutar la suite de pruebas
+npm run test:e2e             # Tests E2E con Cypress (requiere la app en localhost:8000)
 ```
 
 ### Integración continua (Jenkins)
 
 El repositorio incluye un pipeline declarativo (`Jenkinsfile`) que ejecuta Pint,
-PHPUnit y el build de Vite, y despliega la aplicación en Docker. Guía completa:
-[Docs/JENKINS.md](Docs/JENKINS.md).
+PHPUnit, el build de Vite, los tests E2E de humo con Cypress y despliega la
+aplicación en Docker. Guía completa: [Docs/JENKINS.md](Docs/JENKINS.md).
 
 ## Notas de seguridad
 
