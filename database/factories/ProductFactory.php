@@ -33,7 +33,10 @@ class ProductFactory extends Factory
             'precio_bulto' => $precioBulto,
             'precio_unitario_sugerido' => round($precioBulto / $unidades, 2),
             'moq_cantidad_minima' => fake()->numberBetween(1, 30),
-            'stock_disponible' => fake()->numberBetween(0, 200),
+            // El estado por defecto es "disponible": el stock 0 se pide
+            // explícitamente con el estado ->agotado(). Un rango aleatorio
+            // 0..200 hacía fallar tests de forma intermitente (~0.5 %).
+            'stock_disponible' => fake()->numberBetween(1, 200),
             'imagen_url' => null,
             'is_active' => true,
         ];
