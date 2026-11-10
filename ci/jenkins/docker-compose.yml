@@ -1,0 +1,29 @@
+# Jenkins local de Mayoro.
+#
+#   docker compose up -d --build
+#   UI: http://localhost:8080
+#
+# Detalles:
+#   - user: root porque el socket /var/run/docker.sock del host es root:root.
+#     (compromiso aceptable en entorno local de curso; en un servidor real
+#     se aisla con un agente remoto dedicado).
+#   - El volumen jenkins_home persiste builds, credenciales y la APP_KEY de despliegue.
+#   - name: mayoro → la red se llama "mayoro_default", a la que también se
+#     conecta el contenedor de la app para la verificación de salud.
+name: mayoro
+
+services:
+  jenkins:
+    build: .
+    container_name: mayoro-jenkins
+    user: root
+    restart: unless-stopped
+    ports:
+      - "8080:8080"   # UI de Jenkins
+      - "50000:50000" # Puerto de agentes (reservado, no se usa en local)
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  jenkins_home:

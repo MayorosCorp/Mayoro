@@ -153,6 +153,12 @@ php artisan view:cache       # Compilar todas las vistas Blade
 php artisan test             # Ejecutar la suite de pruebas
 ```
 
+### Integración continua (Jenkins)
+
+El repositorio incluye un pipeline declarativo (`Jenkinsfile`) que ejecuta Pint,
+PHPUnit y el build de Vite, y despliega la aplicación en Docker. Guía completa:
+[Docs/JENKINS.md](Docs/JENKINS.md).
+
 ## Notas de seguridad
 
 - `.env`, `vendor/`, `node_modules` y otros artefactos locales están excluidos vía `.gitignore`.

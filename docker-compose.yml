@@ -1,0 +1,39 @@
+# Despliegue manual de Mayoro — mismo resultado que produce el pipeline de Jenkins.
+#
+#   docker compose up -d --build
+#
+# Requiere ci/app/deploy.env con la APP_KEY (ver Docs/JENKINS.md):
+#   php artisan key:generate --show > ci/app/deploy.env  y luego prefijar "APP_KEY="
+#
+# Nota: si Jenkins ya desplegó mayoro-app, deténlo antes
+# (docker rm -f mayoro-app) para evitar conflicto de nombre/puerto.
+name: mayoro-app
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ci/app/Dockerfile
+    image: mayoro/app:latest
+    container_name: mayoro-app
+    restart: unless-stopped
+    ports:
+      - "8000:8080"
+    volumes:
+      - mayoro_storage:/var/www/html/storage
+    env_file:
+      - path: ci/app/deploy.env
+        required: false
+    environment:
+      APP_NAME: Mayoro
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: sqlite
+      DB_DATABASE: /var/www/html/storage/database.sqlite
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: database
+      CACHE_STORE: file
+
+volumes:
+  mayoro_storage:

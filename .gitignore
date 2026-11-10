@@ -12,7 +12,9 @@
 /.vscode
 /.zed
 /.pw-browsers
+/reports
 /shots
+/ci/app/deploy.env
 /auth.json
 /node_modules
 /public/build

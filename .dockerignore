@@ -1,0 +1,35 @@
+# Contexto de build de la imagen de la app (docker build -f ci/app/Dockerfile .)
+# Recuerda: esto filtra lo que Docker RECIBE, independiente de .gitignore.
+
+# VCS y CI/CD propios
+.git
+.github
+ci/jenkins
+docker-compose.yml
+
+# Dependencias (se reinstalan dentro de la imagen)
+node_modules
+vendor
+
+# Artefactos locales y de pruebas
+storage
+database/database.sqlite
+bootstrap/cache/*.php
+tests
+Docs
+shots
+reports
+.phpunit.result.cache
+.phpunit.cache
+.pw-browsers
+.impeccable
+
+# Secretos / entorno local (la imagen usa variables en runtime)
+.env
+.env.testing
+.env.backup
+.env.production
+
+# Enlaces creados en runtime
+public/storage
+public/hot
