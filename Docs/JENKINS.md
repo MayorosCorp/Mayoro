@@ -95,7 +95,8 @@ npm run test:e2e        # modo headless
 npm run cypress:open    # modo interactivo
 
 # Contra otro destino
-CYPRESS_baseUrl=http://localhost:8000 npm run test:e2e
+CYPRESS_baseUrl=http://localhost:8000 npm run test:e2e   # bash
+$env:CYPRESS_baseUrl='http://localhost:8000'; npm run test:e2e   # PowerShell
 ```
 
 En Jenkins la etapa **E2E (Cypress)** corre después de la verificación de salud,
