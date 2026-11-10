@@ -18,6 +18,7 @@ RUN apt-get update \
         xz-utils \
         php8.4-cli \
         php8.4-curl \
+        php8.4-gd \
         php8.4-mbstring \
         php8.4-sqlite3 \
         php8.4-xml \
