@@ -89,6 +89,12 @@ Los tests de humo viven en `cypress/e2e/smoke.cy.js` y cubren portada,
 catálogo, directorio, login válido/inválido y acceso al dashboard. Usan
 `data-testid` para no depender de las clases de Tailwind.
 
+El caso de aceptación `UAT-001` vive en
+`cypress/e2e/uat-001-producto.cy.js`. Simula al usuario QA Carlos Eduardo
+Loaiza Martinez: inicia sesión como Empresario, completa el formulario de
+registro con imagen, guarda el producto y lo busca en el catálogo para validar
+nombre, categoría, precio, MOQ, stock e imagen.
+
 ```bash
 # Local (con la app levantada en http://localhost:8000)
 npm run test:e2e        # modo headless
