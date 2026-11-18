@@ -1,0 +1,27 @@
+### RNF-03 — Caso anónimo: solicitar el formulario protegido.
+### Esperado: HTTP 302 a /login; no se crea producto.
+GET http://localhost:8081/products/create
+Accept: text/html
+
+### RNF-03 — Caso Persona natural: solicitar el formulario protegido.
+### Esperado: HTTP 403; no se crea producto.
+GET http://localhost:8081/products/create
+Cookie: mayoro_rnf03_session=<COOKIE_DE_LA_SESION_PERSONA_NATURAL>
+Accept: text/html
+
+### RNF-03 — Caso anónimo: intentar crear mediante POST.
+### Esperado: redirección al login; no se crea producto.
+POST http://localhost:8081/products
+Content-Type: application/x-www-form-urlencoded
+Accept: text/html
+
+nombre=RNF03-Prueba-Autorizacion&categoria=Abarrotes&presentacion=Caja&unidades_por_bulto=12&precio_bulto=120.00&moq_cantidad_minima=5&stock_disponible=60
+
+### RNF-03 — Caso Persona natural: intentar crear mediante POST.
+### Esperado: HTTP 403; no se crea producto.
+POST http://localhost:8081/products
+Cookie: mayoro_rnf03_session=<COOKIE_DE_LA_SESION_PERSONA_NATURAL>
+Content-Type: application/x-www-form-urlencoded
+Accept: text/html
+
+nombre=RNF03-Prueba-Autorizacion&categoria=Abarrotes&presentacion=Caja&unidades_por_bulto=12&precio_bulto=120.00&moq_cantidad_minima=5&stock_disponible=60

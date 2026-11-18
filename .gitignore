@@ -13,6 +13,7 @@
 /.zed
 /.pw-browsers
 /reports
+/pruebas-no-funcionales/*-summary.json
 /shots
 /ci/app/deploy.env
 /auth.json

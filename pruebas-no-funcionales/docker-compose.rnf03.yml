@@ -1,0 +1,62 @@
+name: mayoro-rnf03
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: ci/app/Dockerfile
+    image: mayoro/rnf03:local
+    environment:
+      APP_NAME: Mayoro-RNF03
+      APP_ENV: testing
+      APP_DEBUG: "false"
+      APP_URL: http://localhost:8081
+      APP_KEY: base64:MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+      DB_CONNECTION: sqlite
+      DB_DATABASE: /tmp/mayoro-rnf03.sqlite
+      CACHE_STORE: array
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+    command: >-
+      sh -lc 'touch /tmp/mayoro-rnf03.sqlite
+      && php artisan migrate:fresh --force
+      && php artisan db:seed --force
+      && exec php artisan serve --host=0.0.0.0 --port=8080'
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "php -r '$$s=@fsockopen(\"127.0.0.1\",8080); exit($$s ? 0 : 1);'"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 30s
+    networks:
+      - rnf03
+
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    profiles: ["security-review"]
+    entrypoint: ["zap.sh"]
+    command:
+      - "-daemon"
+      - "-host"
+      - "0.0.0.0"
+      - "-port"
+      - "8080"
+      - "-config"
+      - "api.disablekey=true"
+      - "-config"
+      - "connection.proxyChain.enabled=false"
+      - "-config"
+      - "scanner.attackOnStart=false"
+    ports:
+      - "8090:8080"
+    networks:
+      - rnf03
+    depends_on:
+      app:
+        condition: service_healthy
+
+networks:
+  rnf03:
+    internal: true
